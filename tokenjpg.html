@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tokenJPG by Somai | E2EE Image Sharing</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            font-size: 2rem;
+            color: var(--text);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 25px;
+            background: #0f172a;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .panel {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel.active {
+            display: flex;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            background: #334155;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px dashed #475569;
+            transition: 0.3s;
+        }
+
+        .file-label:hover {
+            border-color: var(--accent);
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #14532d;
+            border-radius: 8px;
+            display: none;
+            word-break: break-all;
+        }
+
+        .token-display {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin: 10px 0;
+            color: #4ade80;
+        }
+
+        #decrypted-image {
+            max-width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>tokenJPG</h1>
+        <div class="subtitle">by Somai • End-to-End Encrypted</div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('upload')">Upload Image</div>
+            <div class="tab" onclick="switchTab('view')">Retrieve Image</div>
+        </div>
+
+        <div id="upload-panel" class="panel active">
+            <label for="image-input" class="file-label" id="file-label-text">
+                Drop or Click to Choose Image
+            </label>
+            <input type="file" id="image-input" accept="image/*">
+            
+            <input type="password" id="upload-password" placeholder="Set a Decryption Password">
+            <button onclick="handleUpload()">Encrypt & Upload</button>
+            
+            <div id="upload-result" class="result-box">
+                <div>Your Secure Access Code:</div>
+                <div class="token-display" id="generated-code">------</div>
+                <small style="color: #cbd5e1;">Give this 6-digit code and password to the recipient.</small>
+            </div>
+        </div>
+
+        <div id="view-panel" class="panel">
+            <input type="text" id="access-code" placeholder="Enter 6-Digit Code" maxlength="6">
+            <input type="password" id="view-password" placeholder="Enter Decryption Password">
+            <button onclick="handleRetrieve()">Decrypt & View</button>
+            
+            <img id="decrypted-image" alt="Decrypted Output">
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // TODO: Replace with your actual Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- CRYPTOGRAPHY HELPER FUNCTIONS (Web Crypto API) ---
+        
+        async function deriveKey(password, salt) {
+            const encoder = new TextEncoder();
+            const baseKey = await window.crypto.subtle.importKey(
+                "raw", 
+                encoder.encode(password), 
+                { name: "PBKDF2" }, 
+                false, 
+                ["deriveKey"]
+            );
+            return window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: salt,
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                baseKey,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        async function encryptData(binaryData, password) {
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveKey(password, salt);
+            
+            const encryptedContent = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                binaryData
+            );
+
+            // Combine salt, iv, and encrypted data into one string for simple database storage
+            const combined = new Uint8Array(salt.length + iv.length + encryptedContent.byteLength);
+            combined.set(salt, 0);
+            combined.set(iv, salt.length);
+            combined.set(new Uint8Array(encryptedContent), salt.length + iv.length);
+            
+            return btoa(String.fromCharCode.apply(null, combined));
+        }
+
+        async function decryptData(base64Str, password) {
+            const combined = new Uint8Array(atob(base64Str).split("").map(c => c.charCodeAt(0)));
+            const salt = combined.slice(0, 16);
+            const iv = combined.slice(16, 28);
+            const ciphertext = combined.slice(28);
+
+            const key = await deriveKey(password, salt);
+            try {
+                const decrypted = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    ciphertext
+                );
+                return decrypted;
+            } catch (e) {
+                throw new Error("Decryption failed. Incorrect password or corrupted data.");
+            }
+        }
+
+        // --- UI & LOGIC HANDLERS ---
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if(tabName === 'upload') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('upload-panel').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('view-panel').classList.add('active');
+            }
+        }
+
+        const fileInput = document.getElementById('image-input');
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                document.getElementById('file-label-text').innerText = e.target.files[0].name;
+            }
+        });
+
+        window.handleUpload = async function() {
+            const file = fileInput.files[0];
+            const password = document.getElementById('upload-password').value;
+
+            if (!file || !password) {
+                alert("Please select an image and enter a password!");
+                return;
+            }
+
+            try {
+                // Convert image file to ArrayBuffer
+                const arrayBuffer = await file.arrayBuffer();
+                
+                // Encrypt locally
+                const encryptedBase64 = await encryptData(arrayBuffer, password);
+
+                // Generate a unique 6-digit access code
+                const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+                // Upload ONLY the encrypted data to Firestore
+                await setDoc(doc(db, "tokens", code), {
+                    payload: encryptedBase64,
+                    mimeType: file.type,
+                    createdAt: new Date()
+                });
+
+                document.getElementById('generated-code').innerText = code;
+                document.getElementById('upload-result').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                alert("Error handling file upload.");
+            }
+        }
+
+        window.handleRetrieve = async function() {
+            const code = document.getElementById('access-code').value.trim();
+            const password = document.getElementById('view-password').value;
+            const imgElement = document.getElementById('decrypted-image');
+
+            if (!code || !password) {
+                alert("Please fill in both fields.");
+                return;
+            }
+
+            try {
+                // Fetch the record from Firestore
+                const docRef = doc(db, "tokens", code);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    alert("Invalid code! No image found.");
+                    return;
+                }
+
+                const data = docSnap.data();
+                
+                // Decrypt locally in browser
+                const decryptedBuffer = await decryptData(data.payload, password);
+                
+                // Turn array buffer back into displayable blob image
+                const blob = new Blob([decryptedBuffer], { type: data.mimeType });
+                const imageUrl = URL.createObjectURL(blob);
+                
+                imgElement.src = imageUrl;
+                imgElement.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                alert(err.message || "An error occurred during retrieval.");
+            }
+        }
+    </script>
+</body>
+</html>
