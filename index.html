@@ -26,7 +26,7 @@
         }
 
         .container {
-            position: relative; /* Added to position the 3-dot menu relative to the card */
+            position: relative;
             width: 100%;
             max-width: 500px;
             background: var(--card-bg);
@@ -245,19 +245,19 @@
             </label>
             <input type="file" id="image-input" accept="image/*">
             
-            <input type="password" id="upload-password" placeholder="Set a Decryption Password">
+            <input type="password" id="upload-password" placeholder="Set a Password (Optional)">
             <button onclick="handleUpload()">Encrypt & Upload</button>
             
             <div id="upload-result" class="result-box">
                 <div>Your Secure Access Code:</div>
                 <div class="token-display" id="generated-code">------</div>
-                <small style="color: #cbd5e1;">Give this 6-digit code and password to the recipient.</small>
+                <small style="color: #cbd5e1;" id="share-instructions">Give this 6-digit code and password to the recipient.</small>
             </div>
         </div>
 
         <div id="view-panel" class="panel">
             <input type="text" id="access-code" placeholder="Enter 6-Digit Code" maxlength="6">
-            <input type="password" id="view-password" placeholder="Enter Decryption Password">
+            <input type="password" id="view-password" placeholder="Enter Password (Leave blank if none)">
             <button onclick="handleRetrieve()">Decrypt & View</button>
             
             <img id="decrypted-image" alt="Decrypted Output">
@@ -292,156 +292,9 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // Modal Open/Close Logic
+        // Global key fallback string for zero-password uploads
+        const DEFAULT_FALLBACK = "tokenjpg_no_password_secure_salt_string_123!";
+
         window.toggleModal = function(show) {
             const modal = document.getElementById('about-modal');
             modal.style.display = show ? 'flex' : 'none';
-        }
-
-        // --- CRYPTOGRAPHY HELPER FUNCTIONS (Web Crypto API) ---
-        
-        async function deriveKey(password, salt) {
-            const encoder = new TextEncoder();
-            const baseKey = await window.crypto.subtle.importKey(
-                "raw", 
-                encoder.encode(password), 
-                { name: "PBKDF2" }, 
-                false, 
-                ["deriveKey"]
-            );
-            return window.crypto.subtle.deriveKey(
-                {
-                    name: "PBKDF2",
-                    salt: salt,
-                    iterations: 100000,
-                    hash: "SHA-256"
-                },
-                baseKey,
-                { name: "AES-GCM", length: 256 },
-                false,
-                ["encrypt", "decrypt"]
-            );
-        }
-
-        async function encryptData(binaryData, password) {
-            const salt = window.crypto.getRandomValues(new Uint8Array(16));
-            const iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const key = await deriveKey(password, salt);
-            
-            const encryptedContent = await window.crypto.subtle.encrypt(
-                { name: "AES-GCM", iv: iv },
-                key,
-                binaryData
-            );
-
-            const combined = new Uint8Array(salt.length + iv.length + encryptedContent.byteLength);
-            combined.set(salt, 0);
-            combined.set(iv, salt.length);
-            combined.set(new Uint8Array(encryptedContent), salt.length + iv.length);
-            
-            return btoa(String.fromCharCode.apply(null, combined));
-        }
-
-        async function decryptData(base64Str, password) {
-            const combined = new Uint8Array(atob(base64Str).split("").map(c => c.charCodeAt(0)));
-            const salt = combined.slice(0, 16);
-            const iv = combined.slice(16, 28);
-            const ciphertext = combined.slice(28);
-
-            const key = await deriveKey(password, salt);
-            try {
-                const decrypted = await window.crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: iv },
-                    key,
-                    ciphertext
-                );
-                return decrypted;
-            } catch (e) {
-                throw new Error("Decryption failed. Incorrect password or corrupted data.");
-            }
-        }
-
-        // --- UI & LOGIC HANDLERS ---
-
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            
-            if(tabName === 'upload') {
-                document.querySelectorAll('.tab')[0].classList.add('active');
-                document.getElementById('upload-panel').classList.add('active');
-            } else {
-                document.querySelectorAll('.tab')[1].classList.add('active');
-                document.getElementById('view-panel').classList.add('active');
-            }
-        }
-
-        const fileInput = document.getElementById('image-input');
-        fileInput.addEventListener('change', (e) => {
-            if(e.target.files.length > 0) {
-                document.getElementById('file-label-text').innerText = e.target.files[0].name;
-            }
-        });
-
-        window.handleUpload = async function() {
-            const file = fileInput.files[0];
-            const password = document.getElementById('upload-password').value;
-
-            if (!file || !password) {
-                alert("Please select an image and enter a password!");
-                return;
-            }
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const encryptedBase64 = await encryptData(arrayBuffer, password);
-                const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-                await setDoc(doc(db, "tokens", code), {
-                    payload: encryptedBase64,
-                    mimeType: file.type,
-                    createdAt: new Date()
-                });
-
-                document.getElementById('generated-code').innerText = code;
-                document.getElementById('upload-result').style.display = 'block';
-            } catch (err) {
-                console.error(err);
-                alert("Error handling file upload.");
-            }
-        }
-
-        window.handleRetrieve = async function() {
-            const code = document.getElementById('access-code').value.trim();
-            const password = document.getElementById('view-password').value;
-            const imgElement = document.getElementById('decrypted-image');
-
-            if (!code || !password) {
-                alert("Please fill in both fields.");
-                return;
-            }
-
-            try {
-                const docRef = doc(db, "tokens", code);
-                const docSnap = await getDoc(docRef);
-
-                if (!docSnap.exists()) {
-                    alert("Invalid code! No image found.");
-                    return;
-                }
-
-                const data = docSnap.data();
-                const decryptedBuffer = await decryptData(data.payload, password);
-                const blob = new Blob([decryptedBuffer], { type: data.mimeType });
-                const imageUrl = URL.createObjectURL(blob);
-                
-                imgElement.src = imageUrl;
-                imgElement.style.display = 'block';
-            } catch (err) {
-                console.error(err);
-                alert(err.message || "An error occurred during retrieval.");
-            }
-        }
-    </script>
-</body>
-</html>
