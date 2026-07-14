@@ -26,6 +26,7 @@
         }
 
         .container {
+            position: relative; /* Added to position the 3-dot menu relative to the card */
             width: 100%;
             max-width: 500px;
             background: var(--card-bg);
@@ -33,6 +34,76 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             text-align: center;
+        }
+
+        /* 3-Dot Menu Styles */
+        .menu-dots {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            line-height: 1;
+            transition: color 0.3s;
+            padding: 5px;
+        }
+
+        .menu-dots:hover {
+            color: var(--text);
+        }
+
+        /* About Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 350px;
+            width: 80%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #334155;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--text);
+        }
+
+        .modal-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            background: #334155;
+            color: var(--text);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #475569;
         }
 
         h1 {
@@ -158,6 +229,8 @@
 <body>
 
     <div class="container">
+        <div class="menu-dots" onclick="toggleModal(true)">&#8942;</div>
+
         <h1>tokenJPG</h1>
         <div class="subtitle">by Somai • End-to-End Encrypted</div>
 
@@ -191,8 +264,16 @@
         </div>
     </div>
 
+    <div id="about-modal" class="modal-overlay" onclick="toggleModal(false)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>About tokenJPG</h3>
+            <p>Created by som.ai and by Ankur</p>
+            <p style="font-size: 0.85rem; color: #64748b;">A secure, zero-knowledge, local end-to-end encrypted image sharing tool.</p>
+            <button class="close-btn" onclick="toggleModal(false)">Close</button>
+        </div>
+    </div>
+
     <script type="module">
-        // Fixed: Added explicit imports for Firestore module management
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
@@ -207,10 +288,15 @@
             measurementId: "G-DHE6W9VQT4"
         };
 
-        // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        const db = getFirestore(app); // Fixed: Properly established the database connection interface
+        const db = getFirestore(app);
+
+        // Modal Open/Close Logic
+        window.toggleModal = function(show) {
+            const modal = document.getElementById('about-modal');
+            modal.style.display = show ? 'flex' : 'none';
+        }
 
         // --- CRYPTOGRAPHY HELPER FUNCTIONS (Web Crypto API) ---
         
