@@ -287,6 +287,28 @@
 
     <!-- Main Card Container -->
     <div class="container">
+        <a href="index.html" style="position: absolute; top: 20px; left: 25px; cursor: pointer; font-size: 1.1rem; color: #94a3b8; text-decoration: none; font-weight: 600; transition: color 0.2s ease; z-index: 100;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">↩ Hub</a>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const container = document.querySelector('.container') || document.querySelector('.card') || document.body;
+                if(container) { container.style.position = 'relative'; }
+            });
+        </script>
+        <a href="index.html" style="
+            position: absolute; 
+            top: 20px; 
+            left: 25px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            color: var(--text-muted, #94a3b8); 
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            z-index: 10;
+        " onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">
+            ↩ Hub
+        </a>
         <div class="menu-dots" onclick="toggleAboutModal(true)">&#8942;</div>
 
         <h1>tokenJPG</h1>
