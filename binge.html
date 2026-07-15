@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tokenBinge | Cinematic OTT Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #060608;
+            --surface-bg: rgba(22, 22, 30, 0.7);
+            --surface-solid: #121216;
+            --accent-glow: rgba(229, 9, 20, 0.25);
+            --accent: #ff1e27; 
+            --accent-muted: #b80710;
+            --text-main: #ffffff;
+            --text-secondary: #9ca3af;
+            --border-glow: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(229, 9, 20, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 75% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 45%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .ott-layout-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Navigation Header Line */
+        .ott-nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+        }
+
+        .back-hub-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .back-hub-link:hover { color: var(--text-main); transform: translateX(-2px); }
+
+        .brand-logo-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-panel h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 40%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ott-pill {
+            background: var(--accent);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Immersive URL Pipeline Input Box */
+        .premium-input-card {
+            background: var(--surface-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .input-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-row-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 650px) {
+            .input-row-group { flex-direction: column; }
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 18px;
+            background: rgba(10, 10, 12, 0.8);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow), inset 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        button.cinema-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 32px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+            height: 50px;
+        }
+        button.cinema-btn:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Theater Screen Display Enclosure */
+        .cinema-theater-frame {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 80px rgba(229, 9, 20, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Interactive Status / Control Overlay Panels */
+        .streaming-pulse-node {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #4ade80;
+            font-weight: 700;
+            background: rgba(74, 222, 128, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .pulse-dot {
+            width: 6px; height: 6px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse-glow 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        /* Toggle System Drawer for Technical Telemetry */
+        .telemetry-toggle-bar {
+            text-align: center;
+            margin-top: -5px;
+        }
+        .telemetry-link {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .telemetry-link:hover { color: var(--accent); }
+
+        .metrics-drawer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .metrics-drawer.open {
+            max-height: 100px;
+        }
+
+        .metric-tile {
+            background: var(--surface-solid);
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .tile-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
+        .tile-val { font-size: 1.2rem; font-weight: 800; font-family: monospace; margin-top: 4px; }
+        .ahead-glow { color: #4ade80; text-shadow: 0 0 10px rgba(74,222,128,0.2); }
+        .behind-glow { color: #3b82f6; text-shadow: 0 0 10px rgba(59,130,246,0.2); }
+
+        /* Loader Animation Override */
+        .ott-spinner-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(6, 6, 8, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            display: none;
+        }
+        .ott-spinner {
+            width: 45px; height: 45px;
+            border: 4px solid rgba(255,255,255,0.05);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: ott-spin 0.8s linear infinite;
+        }
+        @keyframes ott-spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="ott-layout-wrapper">
+        <div class="ott-nav-header">
+            <a class="back-hub-link" href="index.html">✦ Hub Portal</a>
+            <div class="brand-logo-panel">
+                <h1>tokenBinge</h1>
+                <span class="ott-pill">Cinema Engine</span>
+            </div>
+            <div class="streaming-pulse-node" id="active-pulse">
+                <div class="pulse-dot"></div> DIRECT DYNAMIC DECODE ACTIVE
+            </div>
+        </div>
+
+        <div class="premium-input-card">
+            <div class="input-title">🎬 Stream Pipeline Entry Console</div>
+            <div class="input-row-group">
+                <input type="text" id="stream-link-input" placeholder="Paste direct movie, show, or manifest streaming link here (.m3u8, .mp4)...">
+                <button class="cinema-btn" onclick="fireCinemaPipeline()">Binge Stream</button>
+            </div>
+        </div>
+
+        <div class="cinema-theater-frame">
+            <div class="ott-spinner-overlay" id="ott-loader">
+                <div class="ott-spinner"></div>
+            </div>
+            <video id="cinema-core-element" controls></video>
+        </div>
+
+        <div class="telemetry-toggle-bar">
+            <button class="telemetry-link" onclick="toggleTelemetryView()">📊 Toggle Engine Buffer Telemetry Dashboard</button>
+        </div>
+
+        <div class="metrics-drawer" id="telemetry-drawer">
+            <div class="metric-tile">
+                <div class="tile-lbl">Adaptive Forward Render Loop Target</div>
+                <div class="tile-val ahead-glow" id="lbl-ahead">0.0s / 50s</div>
+            </div>
+            <div class="metric-tile">
+                <div class="tile-lbl">RAM Release Back-Buffer Allocation</div>
+                <div class="tile-val behind-glow" id="lbl-behind">0.0s / 50s max</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+
+    <script>
+        let coreHlsEngine = null;
+        const videoElement = document.getElementById('cinema-core-element');
+        const processingSpinner = document.getElementById('ott-loader');
+        const livePulseNode = document.getElementById('active-pulse');
+
+        // Capture core HTML5 element decoding cycles to coordinate UI tracking points
+        videoElement.addEventListener('waiting', () => processingSpinner.style.display = 'flex');
+        videoElement.addEventListener('playing', () => {
+            processingSpinner.style.display = 'none';
+            livePulseNode.style.opacity = '1';
+        });
+
+        videoElement.addEventListener('timeupdate', () => {
+            const playheadTime = videoElement.currentTime;
+            const runtimeBufferRanges = videoElement.buffered;
+            
+            if (runtimeBufferRanges && runtimeBufferRanges.length > 0) {
+                let forwardBufferSeconds = 0;
+                let backwardBufferSeconds = 0;
+                
+                for (let i = 0; i < runtimeBufferRanges.length; i++) {
+                    if (playheadTime >= runtimeBufferRanges.start(i) && playheadTime <= runtimeBufferRanges.end(i)) {
+                        forwardBufferSeconds = runtimeBufferRanges.end(i) - playheadTime;
+                        backwardBufferSeconds = playheadTime - runtimeBufferRanges.start(i);
+                        break;
+                    }
+                }
+                document.getElementById('lbl-ahead').innerText = `${forwardBufferSeconds.toFixed(1)}s / 50s`;
+                document.getElementById('lbl-behind').innerText = `${backwardBufferSeconds.toFixed(1)}s / 50s`;
+            }
+        });
+
+        function toggleTelemetryView() {
+            const drawer = document.getElementById('telemetry-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        function fireCinemaPipeline() {
+            const externalSourceUrl = document.getElementById('stream-link-input').value.trim();
+            if (!externalSourceUrl) { alert("Please provide a valid asset stream reference string first."); return; }
+
+            // Wipe out pre-existing memory stacks before recycling tracking frameworks
+            if (coreHlsEngine) {
+                coreHlsEngine.destroy();
+                coreHlsEngine = null;
+                livePulseNode.style.opacity = '0';
+            }
+
+            if (Hls.isSupported()) {
+                coreHlsEngine = new Hls({
+                    maxBufferLength: 50,     // Network download gate bound parameters
+                    backBufferLength: 50,    // Memory recycling constraints
+                    enableWorker: true,
+                    lowLatencyMode: false
+                });
+
+                coreHlsEngine.loadSource(externalSourceUrl);
+                coreHlsEngine.attachMedia(videoElement);
+
+                coreHlsEngine.on(Hls.Events.MANIFEST_PARSED, () => {
+                    videoElement.play().catch(() => console.log("Direct pipeline initiated successfully. Playback ready."));
+                });
+
+                coreHlsEngine.on(Hls.Events.ERROR, (evt, errData) => {
+                    if (errData.fatal) {
+                        switch (errData.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                coreHlsEngine.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                coreHlsEngine.recoverMediaError();
+                                break;
+                            default:
+                                alert("Resource endpoint exception error. Verify your URL scheme configurations.");
+                                coreHlsEngine.destroy();
+                                livePulseNode.style.opacity = '0';
+                                break;
+                        }
+                    }
+                });
+            } 
+            else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElement.src = externalSourceUrl;
+                videoElement.play().catch(() => {});
+            } else {
+                alert("This client configuration missing key components required to map these streaming pipelines.");
+            }
+        }
+    </script>
+</body>
+</html>
