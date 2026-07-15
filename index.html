@@ -8,18 +8,23 @@
     <title>tokenJPG | Portal Hub</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
+            --bg-color: #060913;
+            --card-bg: rgba(16, 22, 41, 0.7);
+            --accent: #10b981; /* Premium Cyber Emerald */
+            --accent-glow: rgba(16, 185, 129, 0.25);
             --text: #f8fafc;
             --text-muted: #94a3b8;
-            --border: #334155;
+            --border: rgba(255, 255, 255, 0.06);
+            --btn-bg: rgba(255, 255, 255, 0.02);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
+            /* Soft, ambient geometric mesh radial glow */
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 45%),
+                radial-gradient(circle at 15% 80%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
             color: var(--text);
             margin: 0;
             padding: 20px;
@@ -32,88 +37,209 @@
 
         .welcome-card {
             background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 45px 35px;
+            border-radius: 24px;
             max-width: 480px;
             width: 100%;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 
+                        inset 0 1px 0px rgba(255, 255, 255, 0.1);
             border: 1px solid var(--border);
             text-align: center;
             box-sizing: border-box;
-            position: relative; /* Allows positioning the dots inside the card */
+            position: relative;
         }
 
-        /* Three-Dot Menu Button positioned inside the main card top-right */
+        /* Ambient glowing orb element hidden directly behind header */
+        .card-glow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 40px;
+            background: var(--accent);
+            filter: blur(45px);
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        /* Three-Dot Option Hub Component Placement */
         .menu-dots-btn {
             position: absolute;
-            top: 20px;
-            right: 25px;
+            top: 25px;
+            right: 30px;
             cursor: pointer;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--text-muted);
             user-select: none;
-            transition: color 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             line-height: 1;
             z-index: 10;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
         }
+        
         .menu-dots-btn:hover {
-            color: var(--text);
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
         .welcome-logo {
-            font-size: 3rem;
-            font-weight: 800;
+            font-size: 3.2rem;
+            font-weight: 900;
             margin-bottom: 2px;
-            letter-spacing: -1px;
-            margin-top: 10px; /* Gives space for the dots above */
+            letter-spacing: -2.2px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #ffffff 40%, #a7f3d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .welcome-sublogo {
-            color: #4ade80;
-            font-size: 1.1rem;
+            color: var(--accent);
+            font-size: 1.05rem;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-family: monospace;
+            letter-spacing: 1px;
+            text-transform: lowercase;
         }
 
         .welcome-tagline {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            font-weight: 400;
         }
 
         .hub-options {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 14px;
         }
 
         .hub-btn {
-            background: #0f172a;
+            background: var(--btn-bg);
             border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 14px;
+            padding: 18px 22px;
+            border-radius: 16px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 18px;
             text-decoration: none;
             color: inherit;
         }
 
         .hub-btn:hover {
-            border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.04);
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 
+                        0 0 15px var(--accent-glow);
         }
 
-        .hub-icon { font-size: 2.2rem; }
-        .hub-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
-        .hub-desc { font-size: 0.85rem; color: var(--text-muted); }
+        .hub-icon { 
+            font-size: 1.8rem; 
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
 
-        /* Modal Popup Overlay Styles */
+        .hub-btn:hover .hub-icon {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .hub-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 3px; letter-spacing: -0.3px;}
+        .hub-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* --- Share Component Hub Action Styling --- */
+        .share-platform-container {
+            position: relative;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .hub-share-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            padding: 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .hub-share-btn:hover {
+            border-style: solid;
+            border-color: #ffffff;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .share-vector-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Mini Micro-Toast Popup Overlay Alert */
+        .share-mini-toast {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-6px);
+            background: #090d16;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+
+        .share-mini-toast.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-checkmark {
+            color: var(--accent);
+            font-weight: 800;
+            margin-right: 4px;
+        }
+
+        /* Premium Modal Blurring Overlay Interfaces */
         .modal-overlay {
             display: none; 
             position: fixed; 
@@ -121,77 +247,104 @@
             left: 0; 
             width: 100%; 
             height: 100%;
-            background: rgba(15, 23, 42, 0.85); 
-            backdrop-filter: blur(8px); 
+            background: rgba(4, 6, 12, 0.8); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
             justify-content: center; 
             align-items: center; 
             z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.25s ease;
         }
         
         .modal-content {
-            background: var(--card-bg); 
-            padding: 35px; 
-            border-radius: 20px; 
+            background: #0f1424; 
+            padding: 40px 35px; 
+            border-radius: 24px; 
             max-width: 400px; 
             width: 85%; 
             border: 1px solid var(--border); 
             text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
         }
 
         .about-title {
-            font-size: 1.8rem;
-            font-weight: 800;
+            font-size: 2rem;
+            font-weight: 900;
             margin: 0 0 2px 0;
+            letter-spacing: -1px;
         }
 
         .about-sublogo {
-            color: #4ade80;
+            color: var(--accent);
             font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             font-family: monospace;
         }
 
         .about-credits {
             font-size: 0.95rem;
             color: var(--text-muted);
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
         .about-credits strong {
             color: var(--text);
         }
 
         .india-footer {
-            font-size: 0.85rem;
-            letter-spacing: 2px;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
             color: #94a3b8;
             font-weight: 700;
             text-transform: uppercase;
             margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .close-btn {
-            background: var(--accent); 
-            color: white; 
+            background: #ffffff; 
+            color: #000000; 
             border: none; 
-            padding: 10px 25px;
-            border-radius: 10px; 
+            padding: 12px 25px;
+            border-radius: 12px; 
             font-size: 0.95rem; 
             cursor: pointer; 
-            font-weight: 600; 
-            transition: background 0.2s;
+            font-weight: 700; 
+            transition: all 0.2s ease;
             width: 100%;
             box-sizing: border-box;
         }
         .close-btn:hover { 
-            background: var(--accent-hover); 
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 0 15px var(--accent-glow);
         }
     </style>
 </head>
 <body>
 
     <div class="welcome-card">
-        <!-- Three Dot Icon placed safely inside the card layout container -->
+        <div class="card-glow"></div>
+        
+        <!-- About Context Pop Trigger Node -->
         <div class="menu-dots-btn" onclick="openAboutMenu()">⋮</div>
 
         <div class="welcome-logo">tokenJPG</div>
@@ -206,6 +359,7 @@
                     <div class="hub-desc">Paste video links to stream immediately with automated 50s buffer management.</div>
                 </div>
             </a>
+            
             <a href="books.html" class="hub-btn">
                 <span class="hub-icon">📚</span>
                 <div>
@@ -213,11 +367,12 @@
                     <div class="hub-desc">Discover curated peer recommendations and smart purchase routing links.</div>
                 </div>
             </a>
+            
             <a href="vault.html" class="hub-btn">
                 <span class="hub-icon">📸</span>
                 <div>
                     <div class="hub-title">Secure Image Vault</div>
-                    <div class="hub-desc">Local E2EE browser compression drops & key retrieval.</div>
+                    <div class="hub-desc">Local E2EE browser compression drops & key retrieval systems.</div>
                 </div>
             </a>
 
@@ -225,48 +380,94 @@
                 <span class="hub-icon">💬</span>
                 <div>
                     <div class="hub-title">Real-Time Messaging</div>
-                    <div class="hub-desc">Instant room creation using quick synchronized codes.</div>
+                    <div class="hub-desc">Instant secure room creation using quick synchronized room codes.</div>
                 </div>
             </a>
+
+            <!-- Modern Integrated Native Share Interface Action Component -->
+            <div class="share-platform-container">
+                <button class="hub-share-btn" onclick="triggerPlatformShare(event)">
+                    <svg class="share-vector-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Share Hub Link</span>
+                </button>
+                <div class="share-mini-toast" id="global-share-toast">
+                    <span class="toast-checkmark">✓</span> Portal link copied to clipboard!
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Hidden About Section Popup Modal -->
+    <!-- About Section Overlay Component Modal View -->
     <div id="about-modal" class="modal-overlay" onclick="closeAboutMenuOutside(event)">
         <div class="modal-content">
             <div class="about-title">tokenJPG</div>
             <div class="about-sublogo">som.ai</div>
             
             <div class="about-credits">
-                <strong>Created by:</strong> Ankur
+                <strong>Created by:</strong> Som
             </div>
             
             <div class="india-footer">
-                🧡 Made in India 🤍 💚
+                <span>🧡</span> Made in India <span>💚</span>
             </div>
             
-            <div style="margin-top: 25px;">
-                <button class="close-btn" onclick="closeAboutMenu()">Close</button>
+            <div style="margin-top: 30px;">
+                <button class="close-btn" onclick="closeAboutMenu()">Dismiss</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Modal State Engine Open/Close Animations
         function openAboutMenu() {
-            document.getElementById('about-modal').style.display = 'flex';
+            const modal = document.getElementById('about-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
         }
 
         function closeAboutMenu() {
-            document.getElementById('about-modal').style.display = 'none';
+            const modal = document.getElementById('about-modal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 250);
         }
 
-        // Close the panel if the user clicks anywhere outside the inner popup card box
         function closeAboutMenuOutside(event) {
             if (event.target === document.getElementById('about-modal')) {
                 closeAboutMenu();
             }
         }
-    </script>
 
+        // Adaptive Ecosystem Web-Share Processing Engine logic
+        function triggerPlatformShare(e) {
+            e.preventDefault();
+            const shareConfig = {
+                title: 'tokenJPG Hub',
+                text: 'Access secure workspaces, E2EE image vaulting, streaming players, and live text portals.',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                navigator.share(shareConfig).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const toast = document.getElementById('global-share-toast');
+                    toast.classList.add('visible');
+                    setTimeout(() => {
+                        toast.classList.remove('visible');
+                    }, 2500);
+                }).catch(() => {
+                    alert("URL Copy failed! Please copy the site link directly from the browser context bar.");
+                });
+            }
+        }
+    </script>
 </body>
 </html>
