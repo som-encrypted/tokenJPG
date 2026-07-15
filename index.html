@@ -11,6 +11,7 @@
             --accent: #3b82f6;
             --text: #f8fafc;
             --text-muted: #94a3b8;
+            --success: #22c55e;
         }
 
         body {
@@ -23,8 +24,67 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* Welcome Page Styles */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .welcome-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: 1px solid #334155;
+        }
+
+        .welcome-logo {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        .welcome-tagline {
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .welcome-features {
+            text-align: left;
+            margin: 25px 0;
+            padding-left: 10px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .welcome-features li {
+            margin-bottom: 10px;
+            list-style-type: "✓  ";
+        }
+
+        /* Main Container Layout */
         .container {
             position: relative;
             width: 100%;
@@ -34,6 +94,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             text-align: center;
+            display: block;
         }
 
         /* 3-Dot Menu Styles */
@@ -53,7 +114,7 @@
             color: var(--text);
         }
 
-        /* About Modal Overlay */
+        /* Global Modal & Popup Layouts */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -72,164 +133,109 @@
             background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
-            max-width: 350px;
-            width: 80%;
+            max-width: 380px;
+            width: 85%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             border: 1px solid #334155;
             text-align: center;
+            position: relative;
         }
 
-        .modal-content h3 {
-            margin-top: 0;
-            color: var(--text);
+        /* Shared Watermark style for all popups */
+        .popup-watermark {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #475569;
+            margin-top: 25px;
+            text-transform: uppercase;
         }
 
-        .modal-content p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.5;
+        /* Loader Animation */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(59, 130, 246, 0.2);
+            border-left-color: var(--accent);
+            border-radius: 50%;
+            margin: 20px auto;
+            animation: spin 1s linear infinite;
         }
 
-        .close-btn {
-            margin-top: 15px;
-            background: #334155;
-            color: var(--text);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .close-btn:hover {
-            background: #475569;
-        }
-
-        h1 {
-            margin-bottom: 5px;
-            font-size: 2rem;
-            color: var(--text);
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 0.9rem;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 25px;
-            background: #0f172a;
-            padding: 5px;
-            border-radius: 8px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: 0.3s;
-            font-weight: 600;
-        }
-
-        .tab.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .panel {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .panel.active {
-            display: flex;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .file-label {
-            background: #334155;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px dashed #475569;
-            transition: 0.3s;
-        }
-
-        .file-label:hover {
-            border-color: var(--accent);
-        }
+        h1 { margin-bottom: 5px; font-size: 2rem; color: var(--text); }
+        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem; }
+        
+        .tabs { display: flex; margin-bottom: 25px; background: #0f172a; padding: 5px; border-radius: 8px; }
+        .tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 6px; transition: 0.3s; font-weight: 600; }
+        .tab.active { background: var(--accent); color: white; }
+        
+        .panel { display: none; flex-direction: column; gap: 15px; }
+        .panel.active { display: flex; }
+        
+        input[type="file"] { display: none; }
+        .file-label { background: #334155; padding: 15px; border-radius: 8px; cursor: pointer; border: 2px dashed #475569; transition: 0.3s; }
+        .file-label:hover { border-color: var(--accent); }
 
         input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            box-sizing: border-box;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            text-align: center;
+            width: 100%; padding: 12px; box-sizing: border-box; background: #0f172a;
+            border: 1px solid #334155; border-radius: 8px; color: white; font-size: 1rem; text-align: center;
         }
-
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
+        input:focus { outline: none; border-color: var(--accent); }
 
         button {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
+            background: var(--accent); color: white; border: none; padding: 12px;
+            border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: 0.3s;
         }
+        button:hover { background: #2563eb; }
 
-        button:hover {
-            background: #2563eb;
-        }
+        .close-btn { margin-top: 15px; background: #334155; color: var(--text); border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .close-btn:hover { background: #475569; }
 
-        .result-box {
+        /* Action specific layouts */
+        .share-btn-group {
+            display: flex;
+            gap: 10px;
             margin-top: 20px;
-            padding: 15px;
-            background: #14532d;
-            border-radius: 8px;
-            display: none;
-            word-break: break-all;
         }
+        .share-btn-group button { flex: 1; font-size: 0.9rem; }
+        .btn-secondary { background: #334155; }
+        .btn-secondary:hover { background: #475569; }
 
         .token-display {
-            font-size: 2rem;
-            font-weight: bold;
-            letter-spacing: 4px;
-            margin: 10px 0;
-            color: #4ade80;
+            font-size: 2.2rem; font-weight: bold; letter-spacing: 4px; margin: 15px 0; color: #4ade80;
+            background: #0f172a; padding: 10px; border-radius: 8px; border: 1px dashed #22c55e;
         }
 
-        #decrypted-image {
-            max-width: 100%;
-            margin-top: 20px;
-            border-radius: 8px;
-            display: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+        #decrypted-image { max-width: 100%; margin-top: 20px; border-radius: 8px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
+    <div id="welcome-screen" class="welcome-screen">
+        <div class="welcome-card">
+            <div class="welcome-logo">tokenJPG</div>
+            <div class="welcome-tagline">Secure E2EE Image Sharing</div>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                A zero-knowledge privacy platform. Your files are fully encrypted in your local browser before hitting the cloud storage layer.
+            </p>
+            <ul class="welcome-features">
+                <li>End-to-End Cryptography (AES-GCM 256-bit)</li>
+                <li>Optional client-side access passwords</li>
+                <li>Decentralized, auto-expiring 6-digit access tokens</li>
+            </ul>
+            <button onclick="enterWebsite()" style="width: 100%; font-size: 1.1rem; padding: 14px; margin-top: 10px;">
+                Enter Website
+            </button>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="menu-dots" onclick="toggleModal(true)">&#8942;</div>
+        <div class="menu-dots" onclick="toggleAboutModal(true)">&#8942;</div>
 
         <h1>tokenJPG</h1>
         <div class="subtitle">by Somai • End-to-End Encrypted</div>
@@ -247,12 +253,6 @@
             
             <input type="password" id="upload-password" placeholder="Set a Password (Optional)">
             <button onclick="handleUpload()">Encrypt & Upload</button>
-            
-            <div id="upload-result" class="result-box">
-                <div>Your Secure Access Code:</div>
-                <div class="token-display" id="generated-code">------</div>
-                <small style="color: #cbd5e1;" id="share-instructions">Give this 6-digit code to the recipient.</small>
-            </div>
         </div>
 
         <div id="view-panel" class="panel">
@@ -264,12 +264,36 @@
         </div>
     </div>
 
-    <div id="about-modal" class="modal-overlay" onclick="toggleModal(false)">
+    <div id="about-modal" class="modal-overlay" onclick="toggleAboutModal(false)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>About tokenJPG</h3>
             <p>Created by som.ai and by Ankur</p>
             <p style="font-size: 0.85rem; color: #64748b;">A secure, zero-knowledge, local end-to-end encrypted image sharing tool.</p>
-            <button class="close-btn" onclick="toggleModal(false)">Close</button>
+            <button class="close-btn" onclick="toggleAboutModal(false)">Close</button>
+            <div class="popup-watermark">tokenJPG</div>
+        </div>
+    </div>
+
+    <div id="status-popup" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="status-title">Connecting to Server</h3>
+            <div class="spinner"></div>
+            <p id="status-desc" style="color: var(--text-muted); font-size: 0.9rem;">Processing cryptographic handshake...</p>
+            <div class="popup-watermark">tokenJPG</div>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="success-title">Upload Successful!</h3>
+            
+            <div id="success-dynamic-body"></div>
+
+            <div class="share-btn-group">
+                <button onclick="shareWebsite()">Share App</button>
+                <button class="btn-secondary" onclick="resetToHome()">Home</button>
+            </div>
+            <div class="popup-watermark">tokenJPG</div>
         </div>
     </div>
 
@@ -292,11 +316,56 @@
 
         const DEFAULT_FALLBACK = "tokenjpg_no_password_secure_salt_string_123!";
 
-        window.toggleModal = function(show) {
-            const modal = document.getElementById('about-modal');
-            modal.style.display = show ? 'flex' : 'none';
+        // Welcome flow screen controller
+        window.enterWebsite = function() {
+            const screen = document.getElementById('welcome-screen');
+            screen.style.opacity = '0';
+            setTimeout(() => screen.style.display = 'none', 500);
         }
 
+        window.toggleAboutModal = function(show) {
+            document.getElementById('about-modal').style.display = show ? 'flex' : 'none';
+        }
+
+        // Dedicated pipeline status modal toggle
+        function showStatus(title, description) {
+            document.getElementById('status-title').innerText = title;
+            document.getElementById('status-desc').innerText = description;
+            document.getElementById('status-popup').style.display = 'flex';
+        }
+
+        function hideStatus() {
+            document.getElementById('status-popup').style.display = 'none';
+        }
+
+        // Global sharing interface hook
+        window.shareWebsite = function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'tokenJPG',
+                    text: 'Share end-to-end encrypted images securely using 6-digit access tokens.',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                // Clipboard fallback logic strings
+                navigator.clipboard.writeText(window.location.href);
+                alert("Website link copied to clipboard!");
+            }
+        }
+
+        window.resetToHome = function() {
+            document.getElementById('success-modal').style.display = 'none';
+            // Clear standard input environments safely
+            document.getElementById('upload-password').value = "";
+            document.getElementById('access-code').value = "";
+            document.getElementById('view-password').value = "";
+            document.getElementById('file-label-text').innerText = "Drop or Click to Choose Image";
+            document.getElementById('image-input').value = "";
+            document.getElementById('decrypted-image').style.display = 'none';
+        }
+
+        // --- CRYPTOGRAPHY HELPER FUNCTIONS (Web Crypto API) ---
+        
         async function deriveKey(password, salt) {
             const encoder = new TextEncoder();
             const baseKey = await window.crypto.subtle.importKey(
@@ -357,6 +426,8 @@
             }
         }
 
+        // --- UI & LOGIC HANDLERS ---
+
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -382,16 +453,25 @@
             let password = document.getElementById('upload-password').value;
 
             if (!file) {
-                alert("Please select an image!");
+                alert("Please select an image first!");
                 return;
             }
+
+            // Status Popup Trigger 1: Connecting phase
+            showStatus("Connecting to Server", "Opening local secure cryptographic pipeline...");
 
             const standardFlow = password.length > 0;
             if (!standardFlow) {
                 password = DEFAULT_FALLBACK;
             }
 
+            // Small programmatic delay to let user see connection sequence
+            await new Promise(r => setTimeout(r, 800));
+
             try {
+                // Status Popup Trigger 2: Syncing/Uploading phase
+                showStatus("Uploading to Server", "Encrypting file and writing payload packages...");
+                
                 const arrayBuffer = await file.arrayBuffer();
                 const encryptedBase64 = await encryptData(arrayBuffer, password);
                 const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -402,16 +482,25 @@
                     createdAt: new Date()
                 });
 
-                document.getElementById('generated-code').innerText = code;
-                const infoText = document.getElementById('share-instructions');
-                infoText.innerText = standardFlow 
+                hideStatus();
+
+                // Build output success dialog dynamically
+                const descText = standardFlow 
                     ? "Give this 6-digit code and password to the recipient."
                     : "Give this 6-digit code to the recipient. No password required!";
 
-                document.getElementById('upload-result').style.display = 'block';
+                document.getElementById('success-title').innerText = "Upload Completed!";
+                document.getElementById('success-dynamic-body').innerHTML = `
+                    <div style="color: var(--text-muted); font-size: 0.95rem;">Your Secure Access Code:</div>
+                    <div class="token-display">${code}</div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">${descText}</p>
+                `;
+                
+                document.getElementById('success-modal').style.display = 'flex';
             } catch (err) {
                 console.error(err);
-                alert("Upload failed. Check your Firebase connection/file size.");
+                hideStatus();
+                alert("Upload failed. Check database connection or verification parameters.");
             }
         }
 
@@ -421,20 +510,27 @@
             const imgElement = document.getElementById('decrypted-image');
 
             if (!code) {
-                alert("Please enter the 6-Digit code.");
+                alert("Please enter the 6-Digit token code.");
                 return;
             }
+
+            showStatus("Connecting to Server", "Locating specific block address index...");
 
             if (password.length === 0) {
                 password = DEFAULT_FALLBACK;
             }
 
+            await new Promise(r => setTimeout(r, 600));
+
             try {
+                showStatus("Retrieving from Server", "Downloading token block package payload and local decrypting...");
+                
                 const docRef = doc(db, "tokens", code);
                 const docSnap = await getDoc(docRef);
 
                 if (!docSnap.exists()) {
-                    alert("Invalid code! No image found.");
+                    hideStatus();
+                    alert("Invalid code! No data matches this entry block.");
                     return;
                 }
 
@@ -444,9 +540,19 @@
                 
                 imgElement.src = URL.createObjectURL(blob);
                 imgElement.style.display = 'block';
+                
+                hideStatus();
+
+                // Show dynamic success display modal for clean exit flows
+                document.getElementById('success-title').innerText = "Retrieval Success!";
+                document.getElementById('success-dynamic-body').innerHTML = `
+                    <p style="color: var(--success); font-weight: 600; margin: 15px 0;">✓ Decrypted Image successfully loaded below!</p>
+                `;
+                document.getElementById('success-modal').style.display = 'flex';
             } catch (err) {
                 console.error(err);
-                alert("Decryption failed. Check your password.");
+                hideStatus();
+                alert("Decryption parsing error. Check verification key values.");
             }
         }
     </script>
