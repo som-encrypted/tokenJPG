@@ -9,9 +9,11 @@
             --bg-color: #0f172a;
             --card-bg: #1e293b;
             --accent: #3b82f6;
+            --accent-hover: #2563eb;
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #22c55e;
+            --border: #334155;
         }
 
         body {
@@ -52,7 +54,7 @@
             border-radius: 20px;
             max-width: 450px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            border: 1px solid #334155;
+            border: 1px solid var(--border);
         }
 
         .welcome-logo {
@@ -91,17 +93,17 @@
             max-width: 500px;
             background: var(--card-bg);
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.05);
             text-align: center;
-            display: block;
+            box-sizing: border-box;
         }
 
-        /* 3-Dot Menu Styles */
         .menu-dots {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 25px;
+            right: 25px;
             cursor: pointer;
             font-size: 1.5rem;
             color: var(--text-muted);
@@ -110,11 +112,9 @@
             padding: 5px;
         }
 
-        .menu-dots:hover {
-            color: var(--text);
-        }
+        .menu-dots:hover { color: var(--text); }
 
-        /* Global Modal & Popup Layouts */
+        /* Popups / Modals */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -123,7 +123,7 @@
             width: 100%;
             height: 100%;
             background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -131,35 +131,33 @@
 
         .modal-content {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 380px;
+            padding: 35px;
+            border-radius: 20px;
+            max-width: 400px;
             width: 85%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 1px solid #334155;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
             text-align: center;
             position: relative;
         }
 
-        /* Shared Watermark style for all popups */
         .popup-watermark {
             font-size: 0.75rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             color: #475569;
             margin-top: 25px;
             text-transform: uppercase;
         }
 
-        /* Loader Animation */
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(59, 130, 246, 0.2);
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(59, 130, 246, 0.1);
             border-left-color: var(--accent);
             border-radius: 50%;
-            margin: 20px auto;
-            animation: spin 1s linear infinite;
+            margin: 25px auto;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -167,55 +165,96 @@
             100% { transform: rotate(360deg); }
         }
 
-        h1 { margin-bottom: 5px; font-size: 2rem; color: var(--text); }
-        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem; }
+        h1 { margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
         
-        .tabs { display: flex; margin-bottom: 25px; background: #0f172a; padding: 5px; border-radius: 8px; }
-        .tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 6px; transition: 0.3s; font-weight: 600; }
-        .tab.active { background: var(--accent); color: white; }
+        .tabs { display: flex; margin-bottom: 25px; background: #0f172a; padding: 6px; border-radius: 12px; }
+        .tab { flex: 1; padding: 12px; cursor: pointer; border-radius: 8px; transition: 0.3s ease; font-weight: 600; color: var(--text-muted); }
+        .tab.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
         
-        .panel { display: none; flex-direction: column; gap: 15px; }
+        .panel { display: none; flex-direction: column; gap: 18px; }
         .panel.active { display: flex; }
         
         input[type="file"] { display: none; }
-        .file-label { background: #334155; padding: 15px; border-radius: 8px; cursor: pointer; border: 2px dashed #475569; transition: 0.3s; }
+        
+        /* Advanced Interactive Drag Drop Zone */
+        .file-label {
+            background: #0f172a;
+            padding: 30px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            border: 2px dashed #475569;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .file-label.dragover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
         .file-label:hover { border-color: var(--accent); }
+        .upload-icon { font-size: 2rem; }
+
+        /* Image Local Preview Box */
+        .preview-container {
+            display: none;
+            width: 100%;
+            max-height: 180px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .preview-container img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-preview-btn {
+            position: absolute; top: 8px; right: 8px; background: rgba(15,23,42,0.8);
+            border: none; color: white; border-radius: 50%; width: 24px; height: 24px;
+            cursor: pointer; font-size: 0.8rem; line-height: 24px; padding: 0;
+        }
+
+        /* Password Wrapper for Visibility Button */
+        .input-wrapper { position: relative; width: 100%; }
+        .toggle-password-btn {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0;
+        }
 
         input[type="text"], input[type="password"] {
-            width: 100%; padding: 12px; box-sizing: border-box; background: #0f172a;
-            border: 1px solid #334155; border-radius: 8px; color: white; font-size: 1rem; text-align: center;
+            width: 100%; padding: 14px; box-sizing: border-box; background: #0f172a;
+            border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 1rem; text-align: center;
+            transition: border-color 0.3s;
         }
         input:focus { outline: none; border-color: var(--accent); }
 
         button {
-            background: var(--accent); color: white; border: none; padding: 12px;
-            border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: 0.3s;
+            background: var(--accent); color: white; border: none; padding: 14px;
+            border-radius: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;
         }
-        button:hover { background: #2563eb; }
+        button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
 
-        .close-btn { margin-top: 15px; background: #334155; color: var(--text); border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .close-btn { margin-top: 15px; background: #334155; color: var(--text); border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
         .close-btn:hover { background: #475569; }
 
-        /* Action specific layouts */
-        .share-btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .share-btn-group button { flex: 1; font-size: 0.9rem; }
+        .share-btn-group { display: flex; gap: 12px; margin-top: 20px; }
+        .share-btn-group button { flex: 1; font-size: 0.95rem; }
         .btn-secondary { background: #334155; }
         .btn-secondary:hover { background: #475569; }
 
         .token-display {
-            font-size: 2.2rem; font-weight: bold; letter-spacing: 4px; margin: 15px 0; color: #4ade80;
-            background: #0f172a; padding: 10px; border-radius: 8px; border: 1px dashed #22c55e;
+            font-size: 2.4rem; font-weight: 800; letter-spacing: 6px; margin: 15px 0; color: #4ade80;
+            background: #0f172a; padding: 12px; border-radius: 12px; border: 1px dashed #22c55e;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
         }
 
-        #decrypted-image { max-width: 100%; margin-top: 20px; border-radius: 8px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #decrypted-image { max-width: 100%; margin-top: 20px; border-radius: 12px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
+    <!-- Welcome Screen -->
     <div id="welcome-screen" class="welcome-screen">
         <div class="welcome-card">
             <div class="welcome-logo">tokenJPG</div>
@@ -234,6 +273,7 @@
         </div>
     </div>
 
+    <!-- Main Card Container -->
     <div class="container">
         <div class="menu-dots" onclick="toggleAboutModal(true)">&#8942;</div>
 
@@ -245,25 +285,40 @@
             <div class="tab" onclick="switchTab('view')">Retrieve Image</div>
         </div>
 
+        <!-- Upload Panel -->
         <div id="upload-panel" class="panel active">
-            <label for="image-input" class="file-label" id="file-label-text">
-                Drop or Click to Choose Image
+            <div class="preview-container" id="preview-box">
+                <button class="remove-preview-btn" onclick="clearSelectedFile(event)">✕</button>
+                <img id="local-preview" src="" alt="Selected Preview">
+            </div>
+
+            <label for="image-input" class="file-label" id="drop-zone">
+                <span class="upload-icon">📸</span>
+                <span id="file-label-text">Drag & Drop or Click to Browse</span>
             </label>
             <input type="file" id="image-input" accept="image/*">
             
-            <input type="password" id="upload-password" placeholder="Set a Password (Optional)">
+            <div class="input-wrapper">
+                <input type="password" id="upload-password" placeholder="Set a Password (Optional)">
+                <button class="toggle-password-btn" type="button" onclick="togglePasswordVisibility('upload-password')">👁️</button>
+            </div>
             <button onclick="handleUpload()">Encrypt & Upload</button>
         </div>
 
+        <!-- View/Retrieve Panel -->
         <div id="view-panel" class="panel">
             <input type="text" id="access-code" placeholder="Enter 6-Digit Code" maxlength="6">
-            <input type="password" id="view-password" placeholder="Enter Password (Leave blank if none)">
+            <div class="input-wrapper">
+                <input type="password" id="view-password" placeholder="Enter Password (Leave blank if none)">
+                <button class="toggle-password-btn" type="button" onclick="togglePasswordVisibility('view-password')">👁️</button>
+            </div>
             <button onclick="handleRetrieve()">Decrypt & View</button>
             
             <img id="decrypted-image" alt="Decrypted Output">
         </div>
     </div>
 
+    <!-- About Info Overlay Modal -->
     <div id="about-modal" class="modal-overlay" onclick="toggleAboutModal(false)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>About tokenJPG</h3>
@@ -274,6 +329,7 @@
         </div>
     </div>
 
+    <!-- Status Server Loading Popup -->
     <div id="status-popup" class="modal-overlay">
         <div class="modal-content">
             <h3 id="status-title">Connecting to Server</h3>
@@ -283,6 +339,7 @@
         </div>
     </div>
 
+    <!-- Dynamic Success Action Modal -->
     <div id="success-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="success-title">Upload Successful!</h3>
@@ -327,7 +384,12 @@
             document.getElementById('about-modal').style.display = show ? 'flex' : 'none';
         }
 
-        // Dedicated pipeline status modal toggle
+        // Toggle password character masking visibility
+        window.togglePasswordVisibility = function(inputId) {
+            const field = document.getElementById(inputId);
+            field.type = field.type === "password" ? "text" : "password";
+        }
+
         function showStatus(title, description) {
             document.getElementById('status-title').innerText = title;
             document.getElementById('status-desc').innerText = description;
@@ -343,33 +405,27 @@
             const shareText = "Check out tokenJPG — a local end-to-end encrypted image sharing tool!";
             const shareUrl = "https://som-encrypted.github.io/tokenJPG/";
 
-            // Check if mobile native sharing is available
             if (navigator.share) {
                 navigator.share({
                     title: 'tokenJPG',
                     text: shareText,
                     url: shareUrl
                 })
-                .then(() => {
-                    console.log("Shared successfully!");
-                })
+                .then(() => console.log("Shared successfully!"))
                 .catch((err) => {
-                    // Fallback if desktop browser rejects the native pane layout
-                    console.log("Native share failed or canceled, using clipboard fallback:", err);
+                    console.log("Native share failed, using fallback:", err);
                     copyToClipboardFallback(shareText, shareUrl);
                 });
             } else {
-                // Direct fallback for browsers without native sharing support
                 copyToClipboardFallback(shareText, shareUrl);
             }
         }
 
-        // Helper function for clipboard fallback actions
         function copyToClipboardFallback(text, url) {
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(`${text}\nLink: ${url}`);
-                    alert("App link copied to clipboard! You can now paste and share it with your friends.");
+                    alert("App link copied to clipboard! Share it with your friends.");
                 } else {
                     const tempInput = document.createElement("textarea");
                     tempInput.value = `${text}\nLink: ${url}`;
@@ -377,43 +433,83 @@
                     tempInput.select();
                     document.execCommand("copy");
                     document.body.removeChild(tempInput);
-                    alert("App link copied to clipboard! You can now paste and share it with your friends.");
+                    alert("App link copied to clipboard! Share it with your friends.");
                 }
             } catch (err) {
-                console.error("Clipboard copy failed:", err);
                 alert(`Copy this link to share: ${url}`);
             }
         }
 
         window.resetToHome = function() {
             document.getElementById('success-modal').style.display = 'none';
-            // Clear standard input environments safely
             document.getElementById('upload-password').value = "";
             document.getElementById('access-code').value = "";
             document.getElementById('view-password').value = "";
-            document.getElementById('file-label-text').innerText = "Drop or Click to Choose Image";
-            document.getElementById('image-input').value = "";
+            window.clearSelectedFile(null);
             document.getElementById('decrypted-image').style.display = 'none';
         }
 
-        // --- CRYPTOGRAPHY HELPER FUNCTIONS (Web Crypto API) ---
-        
+        // --- Drag and Drop Feature Control ---
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('image-input');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if(files.length > 0 && files[0].type.startsWith('image/')) {
+                fileInput.files = files;
+                handleFileSelection(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelection(file) {
+            document.getElementById('file-label-text').innerText = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('local-preview').src = e.target.result;
+                document.getElementById('preview-box').style.display = 'block';
+                dropZone.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        window.clearSelectedFile = function(e) {
+            if(e) e.preventDefault();
+            fileInput.value = "";
+            document.getElementById('file-label-text').innerText = "Drag & Drop or Click to Browse";
+            document.getElementById('preview-box').style.display = 'none';
+            document.getElementById('local-preview').src = "";
+            dropZone.style.display = 'flex';
+        }
+
+        // --- CRYPTOGRAPHY HELPER FUNCTIONS ---
         async function deriveKey(password, salt) {
             const encoder = new TextEncoder();
             const baseKey = await window.crypto.subtle.importKey(
-                "raw", 
-                encoder.encode(password), 
-                { name: "PBKDF2" }, 
-                false, 
-                ["deriveKey"]
+                "raw", encoder.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
             );
             return window.crypto.subtle.deriveKey(
-                {
-                    name: "PBKDF2",
-                    salt: salt,
-                    iterations: 100000,
-                    hash: "SHA-256"
-                },
+                { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
                 baseKey,
                 { name: "AES-GCM", length: 256 },
                 false,
@@ -425,18 +521,9 @@
             const salt = window.crypto.getRandomValues(new Uint8Array(16));
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const key = await deriveKey(password, salt);
-            
-            const encryptedContent = await window.crypto.subtle.encrypt(
-                { name: "AES-GCM", iv: iv },
-                key,
-                binaryData
-            );
-
+            const encryptedContent = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, binaryData);
             const combined = new Uint8Array(salt.length + iv.length + encryptedContent.byteLength);
-            combined.set(salt, 0);
-            combined.set(iv, salt.length);
-            combined.set(new Uint8Array(encryptedContent), salt.length + iv.length);
-            
+            combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(encryptedContent), salt.length + iv.length);
             return btoa(String.fromCharCode.apply(null, combined));
         }
 
@@ -445,25 +532,17 @@
             const salt = combined.slice(0, 16);
             const iv = combined.slice(16, 28);
             const ciphertext = combined.slice(28);
-
             const key = await deriveKey(password, salt);
             try {
-                return await window.crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: iv },
-                    key,
-                    ciphertext
-                );
+                return await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ciphertext);
             } catch (e) {
-                throw new Error("Decryption failed. Incorrect password or corrupted data.");
+                throw new Error("Decryption failed.");
             }
         }
-
-        // --- UI & LOGIC HANDLERS ---
 
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            
             if(tabName === 'upload') {
                 document.querySelectorAll('.tab')[0].classList.add('active');
                 document.getElementById('upload-panel').classList.add('active');
@@ -473,34 +552,23 @@
             }
         }
 
-        const fileInput = document.getElementById('image-input');
-        fileInput.addEventListener('change', (e) => {
-            if(e.target.files.length > 0) {
-                document.getElementById('file-label-text').innerText = e.target.files[0].name;
-            }
-        });
-
         window.handleUpload = async function() {
             const file = fileInput.files[0];
             let password = document.getElementById('upload-password').value;
 
             if (!file) {
-                alert("Please select an image first!");
+                alert("Please select or drop an image first!");
                 return;
             }
 
             showStatus("Connecting to Server", "Opening local secure cryptographic pipeline...");
-
             const standardFlow = password.length > 0;
-            if (!standardFlow) {
-                password = DEFAULT_FALLBACK;
-            }
+            if (!standardFlow) password = DEFAULT_FALLBACK;
 
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 600));
 
             try {
-                showStatus("Uploading to Server", "Encrypting file and writing payload packages...");
-                
+                showStatus("Uploading to Server", "Encrypting file chunks locally...");
                 const arrayBuffer = await file.arrayBuffer();
                 const encryptedBase64 = await encryptData(arrayBuffer, password);
                 const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -526,9 +594,8 @@
                 
                 document.getElementById('success-modal').style.display = 'flex';
             } catch (err) {
-                console.error(err);
                 hideStatus();
-                alert("Upload failed. Check database connection or verification parameters.");
+                alert("Upload failed. Try down-sizing the image or re-connecting.");
             }
         }
 
@@ -542,23 +609,19 @@
                 return;
             }
 
-            showStatus("Connecting to Server", "Locating specific block address index...");
-
-            if (password.length === 0) {
-                password = DEFAULT_FALLBACK;
-            }
+            showStatus("Connecting to Server", "Locating requested token block index...");
+            if (password.length === 0) password = DEFAULT_FALLBACK;
 
             await new Promise(r => setTimeout(r, 600));
 
             try {
-                showStatus("Retrieving from Server", "Downloading token block package payload and local decrypting...");
-                
+                showStatus("Retrieving from Server", "Downloading & decrypting payload...");
                 const docRef = doc(db, "tokens", code);
                 const docSnap = await getDoc(docRef);
 
                 if (!docSnap.exists()) {
                     hideStatus();
-                    alert("Invalid code! No data matches this entry block.");
+                    alert("Invalid code! No data matches this entry.");
                     return;
                 }
 
@@ -573,11 +636,10 @@
 
                 document.getElementById('success-title').innerText = "Retrieval Success!";
                 document.getElementById('success-dynamic-body').innerHTML = `
-                    <p style="color: var(--success); font-weight: 600; margin: 15px 0;">✓ Decrypted Image successfully loaded below!</p>
+                    <p style="color: var(--success); font-weight: 600; margin: 15px 0;">✓ Image decrypted locally successfully!</p>
                 `;
                 document.getElementById('success-modal').style.display = 'flex';
             } catch (err) {
-                console.error(err);
                 hideStatus();
                 alert("Decryption parsing error. Check verification key values.");
             }
