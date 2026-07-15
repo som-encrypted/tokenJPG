@@ -177,7 +177,6 @@
         
         input[type="file"] { display: none; }
         
-        /* Advanced Interactive Drag Drop Zone */
         .file-label {
             background: #0f172a;
             padding: 30px 20px;
@@ -197,7 +196,6 @@
         .file-label:hover { border-color: var(--accent); }
         .upload-icon { font-size: 2rem; }
 
-        /* Image Local Preview Box */
         .preview-container {
             display: none;
             width: 100%;
@@ -214,7 +212,6 @@
             cursor: pointer; font-size: 0.8rem; line-height: 24px; padding: 0;
         }
 
-        /* Password Wrapper for Visibility Button */
         .input-wrapper { position: relative; width: 100%; }
         .toggle-password-btn {
             position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
@@ -249,12 +246,27 @@
             text-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
         }
 
+        /* Responsive output display framework */
+        .result-image-container {
+            width: 100%;
+            max-height: 250px;
+            overflow-y: auto;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid var(--border);
+            background: #0f172a;
+        }
+        .result-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
         #decrypted-image { max-width: 100%; margin-top: 20px; border-radius: 12px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
-    <!-- Welcome Screen -->
     <div id="welcome-screen" class="welcome-screen">
         <div class="welcome-card">
             <div class="welcome-logo">tokenJPG</div>
@@ -273,7 +285,6 @@
         </div>
     </div>
 
-    <!-- Main Card Container -->
     <div class="container">
         <div class="menu-dots" onclick="toggleAboutModal(true)">&#8942;</div>
 
@@ -285,7 +296,6 @@
             <div class="tab" onclick="switchTab('view')">Retrieve Image</div>
         </div>
 
-        <!-- Upload Panel -->
         <div id="upload-panel" class="panel active">
             <div class="preview-container" id="preview-box">
                 <button class="remove-preview-btn" onclick="clearSelectedFile(event)">✕</button>
@@ -305,7 +315,6 @@
             <button onclick="handleUpload()">Encrypt & Upload</button>
         </div>
 
-        <!-- View/Retrieve Panel -->
         <div id="view-panel" class="panel">
             <input type="text" id="access-code" placeholder="Enter 6-Digit Code" maxlength="6">
             <div class="input-wrapper">
@@ -318,7 +327,6 @@
         </div>
     </div>
 
-    <!-- About Info Overlay Modal -->
     <div id="about-modal" class="modal-overlay" onclick="toggleAboutModal(false)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>About tokenJPG</h3>
@@ -329,7 +337,6 @@
         </div>
     </div>
 
-    <!-- Status Server Loading Popup -->
     <div id="status-popup" class="modal-overlay">
         <div class="modal-content">
             <h3 id="status-title">Connecting to Server</h3>
@@ -339,7 +346,6 @@
         </div>
     </div>
 
-    <!-- Dynamic Success Action Modal -->
     <div id="success-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="success-title">Upload Successful!</h3>
@@ -373,7 +379,6 @@
 
         const DEFAULT_FALLBACK = "tokenjpg_no_password_secure_salt_string_123!";
 
-        // Welcome flow screen controller
         window.enterWebsite = function() {
             const screen = document.getElementById('welcome-screen');
             screen.style.opacity = '0';
@@ -384,7 +389,6 @@
             document.getElementById('about-modal').style.display = show ? 'flex' : 'none';
         }
 
-        // Toggle password character masking visibility
         window.togglePasswordVisibility = function(inputId) {
             const field = document.getElementById(inputId);
             field.type = field.type === "password" ? "text" : "password";
@@ -400,7 +404,6 @@
             document.getElementById('status-popup').style.display = 'none';
         }
 
-        // Upgraded smart hybrid sharing function
         window.shareWebsite = function() {
             const shareText = "Check out tokenJPG — a local end-to-end encrypted image sharing tool!";
             const shareUrl = "https://som-encrypted.github.io/tokenJPG/";
@@ -447,6 +450,7 @@
             document.getElementById('view-password').value = "";
             window.clearSelectedFile(null);
             document.getElementById('decrypted-image').style.display = 'none';
+            document.getElementById('decrypted-image').src = "";
         }
 
         // --- Drag and Drop Feature Control ---
@@ -628,15 +632,21 @@
                 const data = docSnap.data();
                 const decryptedBuffer = await decryptData(data.payload, password);
                 const blob = new Blob([decryptedBuffer], { type: data.mimeType });
+                const imageUrl = URL.createObjectURL(blob);
                 
-                imgElement.src = URL.createObjectURL(blob);
+                // Keep background main panel updated
+                imgElement.src = imageUrl;
                 imgElement.style.display = 'block';
                 
                 hideStatus();
 
+                // FIX: Embed the image inside the Success Popup view so it is visible immediately!
                 document.getElementById('success-title').innerText = "Retrieval Success!";
                 document.getElementById('success-dynamic-body').innerHTML = `
-                    <p style="color: var(--success); font-weight: 600; margin: 15px 0;">✓ Image decrypted locally successfully!</p>
+                    <p style="color: var(--success); font-weight: 600; margin: 5px 0 15px 0;">✓ Decrypted successfully!</p>
+                    <div class="result-image-container">
+                        <img src="${imageUrl}" alt="Decrypted Content">
+                    </div>
                 `;
                 document.getElementById('success-modal').style.display = 'flex';
             } catch (err) {
