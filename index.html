@@ -251,7 +251,7 @@
             <div id="upload-result" class="result-box">
                 <div>Your Secure Access Code:</div>
                 <div class="token-display" id="generated-code">------</div>
-                <small style="color: #cbd5e1;" id="share-instructions">Give this 6-digit code and password to the recipient.</small>
+                <small style="color: #cbd5e1;" id="share-instructions">Give this 6-digit code to the recipient.</small>
             </div>
         </div>
 
@@ -275,7 +275,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -289,12 +288,167 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // Global key fallback string for zero-password uploads
         const DEFAULT_FALLBACK = "tokenjpg_no_password_secure_salt_string_123!";
 
         window.toggleModal = function(show) {
             const modal = document.getElementById('about-modal');
             modal.style.display = show ? 'flex' : 'none';
+        }
+
+        async function deriveKey(password, salt) {
+            const encoder = new TextEncoder();
+            const baseKey = await window.crypto.subtle.importKey(
+                "raw", 
+                encoder.encode(password), 
+                { name: "PBKDF2" }, 
+                false, 
+                ["deriveKey"]
+            );
+            return window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: salt,
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                baseKey,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        async function encryptData(binaryData, password) {
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveKey(password, salt);
+            
+            const encryptedContent = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                binaryData
+            );
+
+            const combined = new Uint8Array(salt.length + iv.length + encryptedContent.byteLength);
+            combined.set(salt, 0);
+            combined.set(iv, salt.length);
+            combined.set(new Uint8Array(encryptedContent), salt.length + iv.length);
+            
+            return btoa(String.fromCharCode.apply(null, combined));
+        }
+
+        async function decryptData(base64Str, password) {
+            const combined = new Uint8Array(atob(base64Str).split("").map(c => c.charCodeAt(0)));
+            const salt = combined.slice(0, 16);
+            const iv = combined.slice(16, 28);
+            const ciphertext = combined.slice(28);
+
+            const key = await deriveKey(password, salt);
+            try {
+                return await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    ciphertext
+                );
+            } catch (e) {
+                throw new Error("Decryption failed. Incorrect password or corrupted data.");
+            }
+        }
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if(tabName === 'upload') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('upload-panel').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('view-panel').classList.add('active');
+            }
+        }
+
+        const fileInput = document.getElementById('image-input');
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files.length > 0) {
+                document.getElementById('file-label-text').innerText = e.target.files[0].name;
+            }
+        });
+
+        window.handleUpload = async function() {
+            const file = fileInput.files[0];
+            let password = document.getElementById('upload-password').value;
+
+            if (!file) {
+                alert("Please select an image!");
+                return;
+            }
+
+            const standardFlow = password.length > 0;
+            if (!standardFlow) {
+                password = DEFAULT_FALLBACK;
+            }
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const encryptedBase64 = await encryptData(arrayBuffer, password);
+                const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+                await setDoc(doc(db, "tokens", code), {
+                    payload: encryptedBase64,
+                    mimeType: file.type,
+                    createdAt: new Date()
+                });
+
+                document.getElementById('generated-code').innerText = code;
+                const infoText = document.getElementById('share-instructions');
+                infoText.innerText = standardFlow 
+                    ? "Give this 6-digit code and password to the recipient."
+                    : "Give this 6-digit code to the recipient. No password required!";
+
+                document.getElementById('upload-result').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                alert("Upload failed. Check your Firebase connection/file size.");
+            }
+        }
+
+        window.handleRetrieve = async function() {
+            const code = document.getElementById('access-code').value.trim();
+            let password = document.getElementById('view-password').value;
+            const imgElement = document.getElementById('decrypted-image');
+
+            if (!code) {
+                alert("Please enter the 6-Digit code.");
+                return;
+            }
+
+            if (password.length === 0) {
+                password = DEFAULT_FALLBACK;
+            }
+
+            try {
+                const docRef = doc(db, "tokens", code);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    alert("Invalid code! No image found.");
+                    return;
+                }
+
+                const data = docSnap.data();
+                const decryptedBuffer = await decryptData(data.payload, password);
+                const blob = new Blob([decryptedBuffer], { type: data.mimeType });
+                
+                imgElement.src = URL.createObjectURL(blob);
+                imgElement.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                alert("Decryption failed. Check your password.");
+            }
+        }
+    </script>
+</body>
+</html>
