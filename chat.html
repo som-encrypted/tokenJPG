@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tokenChat | Sync Channel Rooms</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .home-icon {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .home-icon:hover { color: var(--text); }
+
+        h1 { margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+        
+        .panel { display: none; flex-direction: column; gap: 18px; }
+        .panel.active { display: flex; }
+        
+        input[type="text"] {
+            width: 100%; padding: 14px; box-sizing: border-box; background: #0f172a;
+            border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 1rem; text-align: center;
+        }
+        input:focus { outline: none; border-color: var(--accent); }
+
+        button {
+            background: var(--accent); color: white; border: none; padding: 14px;
+            border-radius: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;
+        }
+        button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-secondary { background: #334155; }
+        .btn-secondary:hover { background: #475569; }
+
+        /* Real-time Streaming Components */
+        .chat-room-container {
+            display: flex; flex-direction: column; height: 400px; background: #0f172a;
+            border-radius: 16px; border: 1px solid var(--border); overflow: hidden;
+        }
+        .chat-header {
+            background: #1e293b; padding: 12px 15px; font-size: 0.9rem; font-weight: 700;
+            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+        }
+        .messages-box {
+            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+            text-align: left; scroll-behavior: smooth;
+        }
+        .msg-bubble {
+            max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 0.95rem; line-height: 1.4;
+            word-break: break-word;
+        }
+        .msg-bubble.incoming { background: var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg-bubble.outgoing { background: var(--accent); align-self: flex-end; border-bottom-right-radius: 4px; }
+        
+        .chat-input-bar { display: flex; padding: 8px; background: #1e293b; gap: 8px; border-top: 1px solid var(--border); }
+        .chat-input-bar input { text-align: left !important; padding: 10px 14px !important; }
+
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: var(--card-bg); padding: 35px; border-radius: 20px; max-width: 400px; width: 85%; border: 1px solid var(--border); text-align: center;
+        }
+        .spinner {
+            width: 45px; height: 45px; border: 4px solid rgba(59, 130, 246, 0.1);
+            border-left-color: var(--accent); border-radius: 50%; margin: 25px auto; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a class="home-icon" href="index.html">↩ Hub</a>
+        
+        <h1>tokenChat</h1>
+        <div class="subtitle">Temporary Communication Architecture</div>
+
+        <div id="chat-setup-panel" class="panel active">
+            <input type="text" id="chat-room-input" placeholder="Enter or Create 6-Digit Room Code" maxlength="6">
+            <button onclick="initiateChatSession()">Connect to Channel</button>
+            <button class="btn-secondary" onclick="generateRandomChatRoom()">Generate Room Code</button>
+        </div>
+
+        <div id="chat-active-panel" class="panel">
+            <div class="chat-room-container">
+                <div class="chat-header">
+                    <span>Active Channel: <strong id="active-room-title" style="color: #4ade80;">------</strong></span>
+                    <span style="cursor:pointer; color:var(--text-muted);" onclick="exitChatChannel()">Disconnect</span>
+                </div>
+                <div class="messages-box" id="chat-message-stream"></div>
+                <div class="chat-input-bar">
+                    <input type="text" id="message-text-payload" placeholder="Type message..." onkeydown="if(event.key === 'Enter') dispatchChatMessage()">
+                    <button onclick="dispatchChatMessage()" style="padding: 10px 20px;">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="status-popup" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="status-title">Handshake Connection</h3>
+            <div class="spinner"></div>
+            <p id="status-desc" style="color: var(--text-muted); font-size: 0.9rem;">Connecting to Firestore nodes...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSRJdQQh9BSpjY7AeHQxUy1oDiYqbq7nM",
+            authDomain: "tokenjpg.firebaseapp.com",
+            projectId: "tokenjpg",
+            storageBucket: "tokenjpg.firebasestorage.app",
+            messagingSenderId: "150695165161",
+            appId: "1:150695165161:web:274b077489d961472a4478",
+            measurementId: "G-DHE6W9VQT4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let activeChatListenerUnsubscribe = null;
+        let activeRoomIdentityCode = null;
+        // Generate a random temporary browser signature identifier for text allocation layouts
+        const persistentSessionId = Math.random().toString(36).substring(2, 11);
+
+        function showStatus(title, desc) {
+            document.getElementById('status-title').innerText = title;
+            document.getElementById('status-desc').innerText = desc;
+            document.getElementById('status-popup').style.display = 'flex';
+        }
+        function hideStatus() { document.getElementById('status-popup').style.display = 'none'; }
+
+        window.generateRandomChatRoom = function() {
+            document.getElementById('chat-room-input').value = Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        window.initiateChatSession = async function() {
+            const roomCode = document.getElementById('chat-room-input').value.trim();
+            if (roomCode.length !== 6 || isNaN(roomCode)) {
+                alert("Please enter a valid 6-digit room code.");
+                return;
+            }
+
+            activeRoomIdentityCode = roomCode;
+            showStatus("Connecting", "Syncing collection stream registers...");
+            const roomRef = doc(db, "chatrooms", activeRoomIdentityCode);
+            
+            try {
+                const docSnap = await getDoc(roomRef);
+                if (!docSnap.exists()) {
+                    await setDoc(roomRef, { roomCode: activeRoomIdentityCode, messages: [], updatedAt: new Date() });
+                }
+                hideStatus();
+                
+                document.getElementById('chat-setup-panel').classList.remove('active');
+                document.getElementById('chat-active-panel').classList.add('active');
+                document.getElementById('active-room-title').innerText = activeRoomIdentityCode;
+
+                // Bind listener loop stream mapping
+                activeChatListenerUnsubscribe = onSnapshot(roomRef, (snapshot) => {
+                    if (snapshot.exists()) { renderChatStream(snapshot.data().messages || []); }
+                });
+            } catch(err) {
+                hideStatus();
+                alert("Could not establish communication pipeline channel mapping.");
+            }
+        }
+
+        function renderChatStream(messagesArray) {
+            const streamBox = document.getElementById('chat-message-stream');
+            streamBox.innerHTML = "";
+            messagesArray.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.classList.add('msg-bubble', msg.senderId === persistentSessionId ? 'outgoing' : 'incoming');
+                bubble.innerText = msg.text;
+                streamBox.appendChild(bubble);
+            });
+            streamBox.scrollTop = streamBox.scrollHeight;
+        }
+
+        window.dispatchChatMessage = async function() {
+            const inputField = document.getElementById('message-text-payload');
+            const txt = inputField.value.trim();
+            if (!txt) return;
+            inputField.value = "";
+
+            try {
+                await updateDoc(doc(db, "chatrooms", activeRoomIdentityCode), {
+                    messages: arrayUnion({ senderId: persistentSessionId, text: txt, timestamp: new Date().getTime() }),
+                    updatedAt: new Date()
+                });
+            } catch (err) { console.error("Error committing string payload packet:", err); }
+        }
+
+        window.exitChatChannel = function() {
+            if (activeChatListenerUnsubscribe) { activeChatListenerUnsubscribe(); activeChatListenerUnsubscribe = null; }
+            activeRoomIdentityCode = null;
+            document.getElementById('chat-active-panel').classList.remove('active');
+            document.getElementById('chat-setup-panel').classList.add('active');
+            document.getElementById('chat-room-input').value = "";
+        }
+    </script>
+</body>
+</html>
