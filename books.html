@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tokenBooks | Hub & Affiliate Router</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --star-color: #fbbf24;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+
+        .home-icon {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .home-icon:hover { color: var(--text); }
+
+        h1 { text-align: center; margin: 10px 0 5px 0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 700px) {
+            .split-layout { grid-template-columns: 1fr; }
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            color: #4ade80;
+        }
+
+        /* Forms and Inputs styling */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%; padding: 12px; box-sizing: border-box; background: #0f172a;
+            border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 0.95rem;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+
+        button {
+            background: var(--accent); color: white; border: none; padding: 12px;
+            border-radius: 10px; font-size: 0.95rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;
+        }
+        button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+        /* Dynamic Feed Elements styling */
+        .feed-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 550px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .review-card {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .review-book-title { font-weight: 800; font-size: 1.1rem; color: var(--text); }
+        .review-author { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+        .review-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+        .review-text { font-size: 0.9rem; color: #cbd5e1; line-height: 1.4; word-break: break-word; }
+        
+        /* Affiliate Route Buttons */
+        .buy-btn {
+            background: #eab308;
+            color: #0f172a;
+            text-decoration: none;
+            text-align: center;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.2s;
+            margin-top: 5px;
+        }
+        .buy-btn:hover { background: #ca8a04; }
+
+        /* API Instant Query Results list dropdown styling */
+        .search-results-tray {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            display: none;
+        }
+        .search-row {
+            padding: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        .search-row:hover { background: var(--border); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a class="home-icon" href="index.html">↩ Hub</a>
+        
+        <h1>tokenBooks</h1>
+        <div class="subtitle">Peer Recommendations & Monetized Routing Pipeline</div>
+
+        <div class="split-layout">
+            <div>
+                <div class="panel-title">✍️ Post a Recommendation</div>
+                <div class="form-group">
+                    <input type="text" id="user-handle" placeholder="Your Name / Handle" maxlength="15">
+                    
+                    <input type="text" id="book-search-input" placeholder="Type Book Title to Auto-Fill..." oninput="lookupBooksFromAPI()">
+                    <div class="search-results-tray" id="search-tray"></div>
+                    
+                    <input type="text" id="book-author" placeholder="Author Name">
+                    
+                    <select id="book-rating">
+                        <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+                        <option value="4">⭐⭐⭐⭐ (Good Choice)</option>
+                        <option value="3">⭐⭐⭐ (Average Read)</option>
+                        <option value="2">⭐⭐ (Not Recommended)</option>
+                        <option value="1">⭐ (Waste of Time)</option>
+                    </select>
+                    
+                    <textarea id="book-review-text" rows="4" placeholder="Write your brief assessment or study thoughts..."></textarea>
+                    
+                    <button onclick="commitBookReview()">Submit Review</button>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel-title">📖 Community Feed</div>
+                <div class="feed-box" id="reviews-feed-stream">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getFirestore, doc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSRJdQQh9BSpjY7AeHQxUy1oDiYqbq7nM",
+            authDomain: "tokenjpg.firebaseapp.com",
+            projectId: "tokenjpg",
+            storageBucket: "tokenjpg.firebasestorage.app",
+            messagingSenderId: "150695165161",
+            appId: "1:150695165161:web:274b077489d961472a4478",
+            measurementId: "G-DHE6W9VQT4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 🛒 YOUR AMAZON ASSOCIATES TRACKING TAG
+        const AMAZON_TAG = "tokenjpg-21"; 
+
+        let searchDebounceTimeout;
+
+        // Fetch query details straight from Google's Open API network indices completely locally
+        window.lookupBooksFromAPI = function() {
+            clearTimeout(searchDebounceTimeout);
+            const queryStr = document.getElementById('book-search-input').value.trim();
+            const tray = document.getElementById('search-tray');
+            
+            if (queryStr.length < 3) { tray.style.display = 'none'; return; }
+
+            searchDebounceTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryStr)}&maxResults=5`);
+                    const data = await res.json();
+                    
+                    tray.innerHTML = "";
+                    if (data.items && data.items.length > 0) {
+                        tray.style.display = 'block';
+                        data.items.forEach(item => {
+                            const title = item.volumeInfo.title;
+                            const authors = item.volumeInfo.authors ? item.volumeInfo.authors.join(', ') : "Unknown Author";
+                            
+                            const row = document.createElement('div');
+                            row.classList.add('search-row');
+                            row.innerText = `${title} (by ${authors})`;
+                            row.onclick = () => {
+                                document.getElementById('book-search-input').value = title;
+                                document.getElementById('book-author').value = authors;
+                                tray.style.display = 'none';
+                            };
+                            tray.appendChild(row);
+                        });
+                    } else { tray.style.display = 'none'; }
+                } catch(e) { console.error("API error lookup failed:", e); }
+            }, 400);
+        };
+
+        // Commit recommendation item structural data directly down into remote collection documents
+        window.commitBookReview = async function() {
+            const reviewer = document.getElementById('user-handle').value.trim();
+            const title = document.getElementById('book-search-input').value.trim();
+            const author = document.getElementById('book-author').value.trim();
+            const rating = document.getElementById('book-rating').value;
+            const reviewText = document.getElementById('book-review-text').value.trim();
+
+            if (!reviewer || !title || !reviewText) {
+                alert("Please fill in your name, book title, and review description fields.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "bookreviews"), {
+                    reviewerName: reviewer,
+                    bookTitle: title,
+                    bookAuthor: author || "Unknown",
+                    rating: parseInt(rating),
+                    reviewText: reviewText,
+                    timestamp: new Date().getTime()
+                });
+
+                // Reset forms fields
+                document.getElementById('book-search-input').value = "";
+                document.getElementById('book-author').value = "";
+                document.getElementById('book-review-text').value = "";
+            } catch(e) {
+                console.error("Error committing review: ", e);
+                alert("Failed to publish recommendation down to Firestore registry logs.");
+            }
+        };
+
+        // Open Real-time Listener Connection targeting active book logs collection array
+        const q = query(collection(db, "bookreviews"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const feedBox = document.getElementById('reviews-feed-stream');
+            feedBox.innerHTML = "";
+            
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const card = document.createElement('div');
+                card.classList.add('review-card');
+
+                // Generate dynamic Amazon India Search string routing path appended with custom tag parameters
+                const searchString = encodeURIComponent(`${data.bookTitle} ${data.bookAuthor}`);
+                const affiliatePurchaseUrl = `https://www.amazon.in/s?k=${searchString}&tag=${AMAZON_TAG}`;
+
+                let stars = "⭐".repeat(data.rating);
+
+                card.innerHTML = `
+                    <div class="review-book-title">${data.bookTitle}</div>
+                    <div class="review-author">by ${data.bookAuthor}</div>
+                    <div class="review-meta">
+                        <span>By: ${data.reviewerName}</span>
+                        <span>${stars}</span>
+                    </div>
+                    <div class="review-text">${data.reviewText}</div>
+                    <a href="${affiliatePurchaseUrl}" target="_blank" class="buy-btn">
+                        🛒 Buy on Amazon
+                    </a>
+                `;
+                feedBox.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>
