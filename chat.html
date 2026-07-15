@@ -6,18 +6,25 @@
     <title>tokenChat | Sync Channel Rooms</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
+            --bg-color: #030712;
+            --card-bg: rgba(17, 24, 39, 0.45);
+            --accent: #10b981; 
+            --accent-hover: #059669;
+            --accent-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --accent-glow: rgba(16, 185, 129, 0.25);
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(15, 23, 42, 0.6);
+            --incoming-bg: rgba(255, 255, 255, 0.04);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 10% 90%, rgba(59, 130, 246, 0.02) 0%, transparent 40%);
             color: var(--text);
             margin: 0;
             padding: 20px;
@@ -25,6 +32,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .container {
@@ -32,10 +40,12 @@
             width: 100%;
             max-width: 500px;
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 40px 30px;
+            border-radius: 28px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
             text-align: center;
             box-sizing: border-box;
         }
@@ -45,98 +55,210 @@
             top: 25px;
             left: 25px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
             color: var(--text-muted);
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
-        .home-icon:hover { color: var(--text); }
+        .home-icon:hover { 
+            color: #ffffff; 
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
 
-        h1 { margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
-        .subtitle { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
+        h1 { 
+            margin: 20px 0 4px 0; 
+            font-size: 2.5rem; 
+            font-weight: 900; 
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 40%, #d1fae5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.88rem; letter-spacing: 0.2px; }
         
-        .panel { display: none; flex-direction: column; gap: 15px; }
+        .panel { display: none; flex-direction: column; gap: 16px; }
         .panel.active { display: flex; }
         
         input[type="text"] {
-            width: 100%; padding: 14px; box-sizing: border-box; background: #0f172a;
-            border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 1rem; text-align: center;
+            width: 100%; 
+            padding: 16px; 
+            box-sizing: border-box; 
+            background: var(--input-bg);
+            border: 1px solid var(--border); 
+            border-radius: 14px; 
+            color: white; 
+            font-size: 0.98rem; 
+            text-align: center;
+            transition: all 0.25s ease;
         }
-        input:focus { outline: none; border-color: var(--accent); }
+        input:focus { 
+            outline: none; 
+            border-color: rgba(16, 185, 129, 0.4); 
+            box-shadow: 0 0 16px var(--accent-glow);
+            background: rgba(15, 23, 42, 0.8);
+        }
 
         button {
-            background: var(--accent); color: white; border: none; padding: 14px;
-            border-radius: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;
+            background: var(--accent-gradient); 
+            color: white; 
+            border: none; 
+            padding: 16px;
+            border-radius: 14px; 
+            font-size: 0.98rem; 
+            cursor: pointer; 
+            font-weight: 700; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
         }
-        button:hover { background: var(--accent-hover); transform: translateY(-1px); }
-        .btn-secondary { background: #334155; }
-        .btn-secondary:hover { background: #475569; }
-        .btn-danger { background: #ef4444; }
-        .btn-danger:hover { background: #dc2626; }
+        button:hover { 
+            transform: translateY(-1px); 
+            box-shadow: 0 8px 20px var(--accent-glow);
+            filter: brightness(1.08);
+        }
+        .btn-secondary { background: rgba(255, 255, 255, 0.03); color: #f3f4f6; border: 1px solid var(--border); box-shadow: none; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.07); box-shadow: none; filter: none; }
+        .btn-danger { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+        .btn-danger:hover { box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25); }
 
-        /* Room Metadata Dashboard Overlay styles */
+        /* Room Metadata Dashboard styles */
         .meta-display {
-            background: #0f172a;
+            background: var(--input-bg);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px;
+            border-radius: 18px;
+            padding: 16px 20px;
             font-size: 0.88rem;
             text-align: left;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 16px;
         }
-        .meta-line { display: flex; justify-content: space-between; }
-        .meta-val { font-weight: 700; color: #3b82f6; }
+        .meta-line { display: flex; justify-content: space-between; align-items: center; }
+        .meta-val { font-weight: 700; color: var(--accent); letter-spacing: 0.3px; }
 
-        /* Messaging Components */
+        /* Messaging Panel Layout */
         .chat-room-container {
-            display: flex; flex-direction: column; height: 380px; background: #0f172a;
-            border-radius: 16px; border: 1px solid var(--border); overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            height: 420px; 
+            background: rgba(10, 15, 30, 0.7);
+            border-radius: 20px; 
+            border: 1px solid var(--border); 
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
         }
         .chat-header {
-            background: #1e293b; padding: 12px 15px; font-size: 0.9rem; font-weight: 700;
-            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.01); 
+            padding: 16px 20px; 
+            font-size: 0.95rem; 
+            font-weight: 700;
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
         }
         .messages-box {
-            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
-            text-align: left; scroll-behavior: smooth;
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 14px;
+            text-align: left; 
+            scroll-behavior: smooth;
         }
         
-        /* Bubble Text Layout Layouts */
+        /* Premium Aesthetic Message Bubbles */
         .msg-bubble {
-            max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 0.95rem; line-height: 1.4;
-            word-break: break-word; position: relative; display: flex; flex-direction: column;
+            max-width: 78%; 
+            padding: 12px 18px; 
+            border-radius: 18px; 
+            font-size: 0.94rem; 
+            line-height: 1.45;
+            word-break: break-word; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
         }
-        .msg-bubble.incoming { background: var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
-        .msg-bubble.outgoing { background: var(--accent); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-bubble.incoming { 
+            background: var(--incoming-bg); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px; 
+            color: #e5e7eb;
+        }
+        .msg-bubble.outgoing { 
+            background: var(--accent-gradient); 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px; 
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+        }
         
-        .msg-user-label { font-size: 0.72rem; color: #a1a1aa; margin-bottom: 3px; font-weight: 700; }
-        .msg-bubble.outgoing .msg-user-label { color: #bfdbfe; text-align: right; }
+        .msg-user-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 700; letter-spacing: 0.4px; }
+        .msg-bubble.outgoing .msg-user-label { color: #a7f3d0; text-align: right; }
 
         .system-bubble {
-            align-self: center; background: rgba(234, 179, 8, 0.15); color: #eab308;
-            border: 1px solid rgba(234, 179, 8, 0.3); font-size: 0.8rem; padding: 6px 16px;
-            border-radius: 20px; text-align: center; font-weight: 600; margin: 5px 0;
+            align-self: center; 
+            background: rgba(16, 185, 129, 0.05); 
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.12); 
+            font-size: 0.78rem; 
+            padding: 6px 16px;
+            border-radius: 20px; 
+            text-align: center; 
+            font-weight: 600; 
+            margin: 4px 0;
+            letter-spacing: 0.1px;
         }
         
-        .chat-input-bar { display: flex; padding: 8px; background: #1e293b; gap: 8px; border-top: 1px solid var(--border); }
-        .chat-input-bar input { text-align: left !important; padding: 10px 14px !important; }
+        .chat-input-bar { display: flex; padding: 12px; background: rgba(0, 0, 0, 0.2); gap: 10px; border-top: 1px solid var(--border); }
+        .chat-input-bar input { text-align: left !important; padding: 14px 18px !important; border-radius: 12px; }
+        .chat-input-bar button { padding: 0 24px; border-radius: 12px; }
 
-        /* Modal Overlay Popups */
+        /* Modal Overlays Layouts */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000;
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(3, 7, 18, 0.9); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000;
         }
         .modal-content {
-            background: var(--card-bg); padding: 35px; border-radius: 20px; max-width: 400px; width: 85%; border: 1px solid var(--border); text-align: center;
+            background: #0b0f19; 
+            padding: 40px 35px; 
+            border-radius: 24px; 
+            max-width: 400px; 
+            width: 85%; 
+            border: 1px solid var(--border); 
+            text-align: center;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.7);
         }
-        .modal-content h3 { margin-top: 0; font-size: 1.4rem; }
-        .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .modal-content h3 { margin-top: 0; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.5px; }
+        .modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+        
         .spinner {
-            width: 45px; height: 45px; border: 4px solid rgba(59, 130, 246, 0.1);
-            border-left-color: var(--accent); border-radius: 50%; margin: 25px auto; animation: spin 0.8s linear infinite;
+            width: 36px; 
+            height: 36px; 
+            border: 3px solid rgba(16, 185, 129, 0.08);
+            border-left-color: var(--accent); 
+            border-radius: 50%; 
+            margin: 25px auto; 
+            animation: spin 0.75s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -149,7 +271,6 @@
         <h1>tokenChat</h1>
         <div class="subtitle">Temporary Communication Architecture</div>
 
-        <!-- Configuration Entry Setup Panel Container -->
         <div id="chat-setup-panel" class="panel active">
             <input type="text" id="chat-user-name-input" placeholder="Choose Your Handle / Username" maxlength="15">
             <input type="text" id="chat-room-input" placeholder="Enter or Create 6-Digit Room Code" maxlength="6">
@@ -157,7 +278,6 @@
             <button class="btn-secondary" onclick="generateRandomChatRoom()">Generate Room Code</button>
         </div>
 
-        <!-- Core Connected Workspace Panel Interface -->
         <div id="chat-active-panel" class="panel">
             <div class="meta-display">
                 <div class="meta-line"><span>Room Creator:</span> <span class="meta-val" id="meta-creator-name">---</span></div>
@@ -166,19 +286,18 @@
 
             <div class="chat-room-container">
                 <div class="chat-header">
-                    <span>Channel: <strong id="active-room-title" style="color: #4ade80;">------</strong></span>
-                    <button class="btn-danger" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;" onclick="exitChatChannel()">Leave Chat</button>
+                    <span>Channel: <strong id="active-room-title" style="color: #10b981;">------</strong></span>
+                    <button class="btn-danger" style="padding: 8px 14px; font-size: 0.8rem; border-radius: 8px;" onclick="exitChatChannel()">Leave Chat</button>
                 </div>
                 <div class="messages-box" id="chat-message-stream"></div>
                 <div class="chat-input-bar">
                     <input type="text" id="message-text-payload" placeholder="Type message..." onkeydown="if(event.key === 'Enter') dispatchChatMessage()">
-                    <button onclick="dispatchChatMessage()" style="padding: 10px 20px;">Send</button>
+                    <button onclick="dispatchChatMessage()">Send</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Live Dynamic Status Window Handshake Modal -->
     <div id="status-popup" class="modal-overlay">
         <div class="modal-content">
             <h3 id="status-title">Handshake Connection</h3>
@@ -187,7 +306,6 @@
         </div>
     </div>
 
-    <!-- Post-Exit Dynamic Routing Option Selection Modal Popup -->
     <div id="exit-share-popup" class="modal-overlay">
         <div class="modal-content">
             <h3>Channel Disconnected</h3>
@@ -213,8 +331,13 @@
             measurementId: "G-DHE6W9VQT4"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        let app, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (setupError) {
+            console.error("Firebase startup anomaly:", setupError);
+        }
 
         let activeChatListenerUnsubscribe = null;
         let activeRoomIdentityCode = null;
@@ -228,8 +351,15 @@
         }
         function hideStatus() { document.getElementById('status-popup').style.display = 'none'; }
 
+        // Pre-creation popup animation wrapper
         window.generateRandomChatRoom = function() {
-            document.getElementById('chat-room-input').value = Math.floor(100000 + Math.random() * 900000).toString();
+            showStatus("Allocating Channel", "Generating unique 6-digit channel node signatures...");
+            
+            setTimeout(() => {
+                const calculatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+                document.getElementById('chat-room-input').value = calculatedCode;
+                hideStatus();
+            }, 850); // Fluid delay execution step
         }
 
         window.initiateChatSession = async function() {
@@ -238,6 +368,7 @@
             
             if (!nameInput) { alert("Please provide a username before proceeding."); return; }
             if (roomCode.length !== 6 || isNaN(roomCode)) { alert("Please enter a valid 6-digit room code."); return; }
+            if (!db) { alert("Ecosystem synchronization failed. Please check internet access pathways."); return; }
 
             savedClientProfileName = nameInput;
             activeRoomIdentityCode = roomCode;
@@ -249,7 +380,6 @@
                 const docSnap = await getDoc(roomRef);
                 
                 if (!docSnap.exists()) {
-                    // Instantiating a brand-new space assigns this user as the Creator.
                     await setDoc(roomRef, {
                         roomCode: activeRoomIdentityCode,
                         creatorName: savedClientProfileName,
@@ -262,7 +392,6 @@
                         updatedAt: new Date()
                     });
                 } else {
-                    // Existing spaces update the tracking index array and append an entry text notice.
                     await updateDoc(roomRef, {
                         activeMembersList: arrayUnion(persistentSessionId),
                         messages: arrayUnion({
@@ -278,23 +407,23 @@
                 document.getElementById('chat-active-panel').classList.add('active');
                 document.getElementById('active-room-title').innerText = activeRoomIdentityCode;
 
-                // Bind listener loop pipeline
                 activeChatListenerUnsubscribe = onSnapshot(roomRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.data();
                         document.getElementById('meta-creator-name').innerText = data.creatorName || "Unknown";
                         
-                        // Parse lengths to derive dynamic real-time participant volume count metrics
                         const totalMembers = data.activeMembersList ? data.activeMembersList.length : 1;
                         document.getElementById('meta-people-count').innerText = totalMembers;
                         
                         renderChatStream(data.messages || []);
                     }
+                }, (error) => {
+                    console.error("Active presence tracking interrupted:", error);
                 });
             } catch(err) {
                 hideStatus();
-                console.error(err);
-                alert("Failed to synchronize connection handshake stream mappings.");
+                console.error("Ecosystem sync abort trace details:", err);
+                alert("Handshake Sync Timeout: The signaling database took too long to respond. Please press Connect again to establish room mapping.");
             }
         }
 
@@ -329,7 +458,7 @@
         window.dispatchChatMessage = async function() {
             const inputField = document.getElementById('message-text-payload');
             const txt = inputField.value.trim();
-            if (!txt) return;
+            if (!txt || !db) return;
             inputField.value = "";
 
             try {
@@ -343,14 +472,13 @@
                     }),
                     updatedAt: new Date()
                 });
-            } catch (err) { console.error("Error committing string payload packet:", err); }
+            } catch (err) { console.error("Error committing message payload packet:", err); }
         }
 
         window.exitChatChannel = async function() {
             if (activeChatListenerUnsubscribe) { activeChatListenerUnsubscribe(); activeChatListenerUnsubscribe = null; }
             
-            // Send exit message notice to document state history array before disconnecting view mappings
-            if (activeRoomIdentityCode) {
+            if (activeRoomIdentityCode && db) {
                 try {
                     const roomRef = doc(db, "chatrooms", activeRoomIdentityCode);
                     const docSnap = await getDoc(roomRef);
@@ -367,7 +495,7 @@
                             })
                         });
                     }
-                } catch(e) { console.error("Error pushing exit metadata log: ", e); }
+                } catch(e) { console.error("Error pushing exit log metrics: ", e); }
             }
 
             activeRoomIdentityCode = null;
@@ -375,17 +503,25 @@
             document.getElementById('chat-setup-panel').classList.add('active');
             document.getElementById('chat-room-input').value = "";
             
-            // Present prompt overlay setup options interface
             document.getElementById('exit-share-popup').style.display = 'flex';
         }
 
         window.copyWebsiteInviteLink = function() {
             const webAddressPath = window.location.origin + window.location.pathname.replace('chat.html', 'index.html');
-            navigator.clipboard.writeText(webAddressPath).then(() => {
-                alert("Website address path copied to clipboard panel dashboard successfully!");
-            }).catch(() => {
-                alert("Link: " + webAddressPath);
-            });
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'tokenJPG Hub',
+                    text: 'Connect to my temporary synchronized communication channel space room inside tokenChat.',
+                    url: webAddressPath
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(webAddressPath).then(() => {
+                    alert("Website address path copied to clipboard panels successfully!");
+                }).catch(() => {
+                    alert("Invite Link: " + webAddressPath);
+                });
+            }
         }
 
         window.redirectToHubPortal = function() {
