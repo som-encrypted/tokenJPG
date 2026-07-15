@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tokenJPG Suite | Portal Hub</title>
+    <title>tokenJPG | Portal Hub</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -27,6 +27,24 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Three-Dot Menu Button Positioned in Top Right Corner */
+        .menu-dots-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            cursor: pointer;
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            user-select: none;
+            transition: color 0.2s ease;
+            padding: 5px 10px;
+            line-height: 1;
+        }
+        .menu-dots-btn:hover {
+            color: var(--text);
         }
 
         .welcome-card {
@@ -93,40 +111,89 @@
         .hub-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
         .hub-desc { font-size: 0.85rem; color: var(--text-muted); }
 
-        .about-divider {
-            margin: 25px 0 15px 0;
-            border: 0;
-            border-top: 1px solid var(--border);
+        /* Modal Overlay Styles for About Section */
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(8px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: var(--card-bg); 
+            padding: 35px; 
+            border-radius: 20px; 
+            max-width: 400px; 
+            width: 85%; 
+            border: 1px solid var(--border); 
+            text-align: center;
+            position: relative;
+        }
+
+        .about-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0 0 2px 0;
+        }
+
+        .about-sublogo {
+            color: #4ade80;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: monospace;
         }
 
         .about-credits {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-muted);
-            line-height: 1.6;
+            margin-bottom: 25px;
         }
-
         .about-credits strong {
             color: var(--text);
         }
 
         .india-footer {
-            margin-top: 25px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             letter-spacing: 2px;
             color: #94a3b8;
             font-weight: 700;
             text-transform: uppercase;
+            margin-top: 15px;
         }
-        .flag-colors {
-            display: inline-block;
-            font-weight: 800;
+
+        .close-btn {
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            padding: 10px 25px;
+            border-radius: 10px; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: background 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .close-btn:hover { 
+            background: var(--accent-hover); 
         }
     </style>
 </head>
 <body>
 
+    <!-- Three Dot Icon -->
+    <div class="menu-dots-btn" onclick="openAboutMenu()">⋮</div>
+
     <div class="welcome-card">
-        <div class="welcome-logo">tokenJPG Suite</div>
+        <div class="welcome-logo">tokenJPG</div>
         <div class="welcome-sublogo">som.ai</div>
         <div class="welcome-tagline">Secure Workspace Ecosystem</div>
         
@@ -147,17 +214,44 @@
                 </div>
             </a>
         </div>
+    </div>
 
-        <hr class="about-divider">
-        
-        <div class="about-credits">
-            <strong>Created by:</strong> Ankur
+    <!-- Hidden About Section Popup Modal -->
+    <div id="about-modal" class="modal-overlay" onclick="closeAboutMenuOutside(event)">
+        <div class="modal-content">
+            <div class="about-title">tokenJPG</div>
+            <div class="about-sublogo">som.ai</div>
+            
+            <div class="about-credits">
+                <strong>Created by:</strong> Ankur
+            </div>
+            
+            <div class="india-footer">
+                🧡 Made in India 🤍 💚
+            </div>
+            
+            <div style="margin-top: 25px;">
+                <button class="close-btn" onclick="closeAboutMenu()">Close</button>
+            </div>
         </div>
     </div>
 
-    <div class="india-footer">
-        🧡 Made in India 🤍 💚
-    </div>
+    <script>
+        function openAboutMenu() {
+            document.getElementById('about-modal').style.display = 'flex';
+        }
+
+        function closeAboutMenu() {
+            document.getElementById('about-modal').style.display = 'none';
+        }
+
+        // Close the panel if the user clicks anywhere outside the inner popup card box
+        function closeAboutMenuOutside(event) {
+            if (event.target === document.getElementById('about-modal')) {
+                closeAboutMenu();
+            }
+        }
+    </script>
 
 </body>
 </html>
