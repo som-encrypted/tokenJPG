@@ -53,9 +53,9 @@
         .home-icon:hover { color: var(--text); }
 
         h1 { margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
-        .subtitle { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+        .subtitle { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
         
-        .panel { display: none; flex-direction: column; gap: 18px; }
+        .panel { display: none; flex-direction: column; gap: 15px; }
         .panel.active { display: flex; }
         
         input[type="text"] {
@@ -71,30 +71,60 @@
         button:hover { background: var(--accent-hover); transform: translateY(-1px); }
         .btn-secondary { background: #334155; }
         .btn-secondary:hover { background: #475569; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
 
-        /* Real-time Streaming Components */
+        /* Room Metadata Dashboard Overlay styles */
+        .meta-display {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 0.88rem;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        .meta-line { display: flex; justify-content: space-between; }
+        .meta-val { font-weight: 700; color: #3b82f6; }
+
+        /* Messaging Components */
         .chat-room-container {
-            display: flex; flex-direction: column; height: 400px; background: #0f172a;
+            display: flex; flex-direction: column; height: 380px; background: #0f172a;
             border-radius: 16px; border: 1px solid var(--border); overflow: hidden;
         }
         .chat-header {
             background: #1e293b; padding: 12px 15px; font-size: 0.9rem; font-weight: 700;
-            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
         }
         .messages-box {
             flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
             text-align: left; scroll-behavior: smooth;
         }
+        
+        /* Bubble Text Layout Layouts */
         .msg-bubble {
             max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 0.95rem; line-height: 1.4;
-            word-break: break-word;
+            word-break: break-word; position: relative; display: flex; flex-direction: column;
         }
         .msg-bubble.incoming { background: var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
         .msg-bubble.outgoing { background: var(--accent); align-self: flex-end; border-bottom-right-radius: 4px; }
         
+        .msg-user-label { font-size: 0.72rem; color: #a1a1aa; margin-bottom: 3px; font-weight: 700; }
+        .msg-bubble.outgoing .msg-user-label { color: #bfdbfe; text-align: right; }
+
+        .system-bubble {
+            align-self: center; background: rgba(234, 179, 8, 0.15); color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3); font-size: 0.8rem; padding: 6px 16px;
+            border-radius: 20px; text-align: center; font-weight: 600; margin: 5px 0;
+        }
+        
         .chat-input-bar { display: flex; padding: 8px; background: #1e293b; gap: 8px; border-top: 1px solid var(--border); }
         .chat-input-bar input { text-align: left !important; padding: 10px 14px !important; }
 
+        /* Modal Overlay Popups */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000;
@@ -102,6 +132,8 @@
         .modal-content {
             background: var(--card-bg); padding: 35px; border-radius: 20px; max-width: 400px; width: 85%; border: 1px solid var(--border); text-align: center;
         }
+        .modal-content h3 { margin-top: 0; font-size: 1.4rem; }
+        .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .spinner {
             width: 45px; height: 45px; border: 4px solid rgba(59, 130, 246, 0.1);
             border-left-color: var(--accent); border-radius: 50%; margin: 25px auto; animation: spin 0.8s linear infinite;
@@ -117,17 +149,25 @@
         <h1>tokenChat</h1>
         <div class="subtitle">Temporary Communication Architecture</div>
 
+        <!-- Configuration Entry Setup Panel Container -->
         <div id="chat-setup-panel" class="panel active">
+            <input type="text" id="chat-user-name-input" placeholder="Choose Your Handle / Username" maxlength="15">
             <input type="text" id="chat-room-input" placeholder="Enter or Create 6-Digit Room Code" maxlength="6">
             <button onclick="initiateChatSession()">Connect to Channel</button>
             <button class="btn-secondary" onclick="generateRandomChatRoom()">Generate Room Code</button>
         </div>
 
+        <!-- Core Connected Workspace Panel Interface -->
         <div id="chat-active-panel" class="panel">
+            <div class="meta-display">
+                <div class="meta-line"><span>Room Creator:</span> <span class="meta-val" id="meta-creator-name">---</span></div>
+                <div class="meta-line"><span>Active Connections:</span> <span class="meta-val" id="meta-people-count">0</span></div>
+            </div>
+
             <div class="chat-room-container">
                 <div class="chat-header">
-                    <span>Active Channel: <strong id="active-room-title" style="color: #4ade80;">------</strong></span>
-                    <span style="cursor:pointer; color:var(--text-muted);" onclick="exitChatChannel()">Disconnect</span>
+                    <span>Channel: <strong id="active-room-title" style="color: #4ade80;">------</strong></span>
+                    <button class="btn-danger" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;" onclick="exitChatChannel()">Leave Chat</button>
                 </div>
                 <div class="messages-box" id="chat-message-stream"></div>
                 <div class="chat-input-bar">
@@ -138,11 +178,24 @@
         </div>
     </div>
 
+    <!-- Live Dynamic Status Window Handshake Modal -->
     <div id="status-popup" class="modal-overlay">
         <div class="modal-content">
             <h3 id="status-title">Handshake Connection</h3>
             <div class="spinner"></div>
             <p id="status-desc" style="color: var(--text-muted); font-size: 0.9rem;">Connecting to Firestore nodes...</p>
+        </div>
+    </div>
+
+    <!-- Post-Exit Dynamic Routing Option Selection Modal Popup -->
+    <div id="exit-share-popup" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Channel Disconnected</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">You have successfully cleared your active session presence channel loop.</p>
+            <div class="modal-actions">
+                <button onclick="copyWebsiteInviteLink()">Share Website Link</button>
+                <button class="btn-secondary" onclick="redirectToHubPortal()">Return to Hub Home</button>
+            </div>
         </div>
     </div>
 
@@ -165,7 +218,7 @@
 
         let activeChatListenerUnsubscribe = null;
         let activeRoomIdentityCode = null;
-        // Generate a random temporary browser signature identifier for text allocation layouts
+        let savedClientProfileName = "";
         const persistentSessionId = Math.random().toString(36).substring(2, 11);
 
         function showStatus(title, desc) {
@@ -180,45 +233,95 @@
         }
 
         window.initiateChatSession = async function() {
+            const nameInput = document.getElementById('chat-user-name-input').value.trim();
             const roomCode = document.getElementById('chat-room-input').value.trim();
-            if (roomCode.length !== 6 || isNaN(roomCode)) {
-                alert("Please enter a valid 6-digit room code.");
-                return;
-            }
+            
+            if (!nameInput) { alert("Please provide a username before proceeding."); return; }
+            if (roomCode.length !== 6 || isNaN(roomCode)) { alert("Please enter a valid 6-digit room code."); return; }
 
+            savedClientProfileName = nameInput;
             activeRoomIdentityCode = roomCode;
-            showStatus("Connecting", "Syncing collection stream registers...");
+            
+            showStatus("Connecting", "Syncing channel profile data structure components...");
             const roomRef = doc(db, "chatrooms", activeRoomIdentityCode);
             
             try {
                 const docSnap = await getDoc(roomRef);
-                if (!docSnap.exists()) {
-                    await setDoc(roomRef, { roomCode: activeRoomIdentityCode, messages: [], updatedAt: new Date() });
-                }
-                hideStatus();
                 
+                if (!docSnap.exists()) {
+                    // Instantiating a brand-new space assigns this user as the Creator.
+                    await setDoc(roomRef, {
+                        roomCode: activeRoomIdentityCode,
+                        creatorName: savedClientProfileName,
+                        activeMembersList: [persistentSessionId],
+                        messages: [{
+                            type: "system",
+                            text: `${savedClientProfileName} created this conversation room.`,
+                            timestamp: new Date().getTime()
+                        }],
+                        updatedAt: new Date()
+                    });
+                } else {
+                    // Existing spaces update the tracking index array and append an entry text notice.
+                    await updateDoc(roomRef, {
+                        activeMembersList: arrayUnion(persistentSessionId),
+                        messages: arrayUnion({
+                            type: "system",
+                            text: `${savedClientProfileName} entered the room.`,
+                            timestamp: new Date().getTime()
+                        })
+                    });
+                }
+                
+                hideStatus();
                 document.getElementById('chat-setup-panel').classList.remove('active');
                 document.getElementById('chat-active-panel').classList.add('active');
                 document.getElementById('active-room-title').innerText = activeRoomIdentityCode;
 
-                // Bind listener loop stream mapping
+                // Bind listener loop pipeline
                 activeChatListenerUnsubscribe = onSnapshot(roomRef, (snapshot) => {
-                    if (snapshot.exists()) { renderChatStream(snapshot.data().messages || []); }
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        document.getElementById('meta-creator-name').innerText = data.creatorName || "Unknown";
+                        
+                        // Parse lengths to derive dynamic real-time participant volume count metrics
+                        const totalMembers = data.activeMembersList ? data.activeMembersList.length : 1;
+                        document.getElementById('meta-people-count').innerText = totalMembers;
+                        
+                        renderChatStream(data.messages || []);
+                    }
                 });
             } catch(err) {
                 hideStatus();
-                alert("Could not establish communication pipeline channel mapping.");
+                console.error(err);
+                alert("Failed to synchronize connection handshake stream mappings.");
             }
         }
 
         function renderChatStream(messagesArray) {
             const streamBox = document.getElementById('chat-message-stream');
             streamBox.innerHTML = "";
+            
             messagesArray.forEach(msg => {
-                const bubble = document.createElement('div');
-                bubble.classList.add('msg-bubble', msg.senderId === persistentSessionId ? 'outgoing' : 'incoming');
-                bubble.innerText = msg.text;
-                streamBox.appendChild(bubble);
+                if (msg.type === "system") {
+                    const sysBubble = document.createElement('div');
+                    sysBubble.classList.add('system-bubble');
+                    sysBubble.innerText = msg.text;
+                    streamBox.appendChild(sysBubble);
+                } else {
+                    const bubble = document.createElement('div');
+                    bubble.classList.add('msg-bubble', msg.senderId === persistentSessionId ? 'outgoing' : 'incoming');
+                    
+                    const userLabel = document.createElement('span');
+                    userLabel.classList.add('msg-user-label');
+                    userLabel.innerText = msg.senderName || "Anonymous";
+                    
+                    const textPayload = document.createTextNode(msg.text);
+                    
+                    bubble.appendChild(userLabel);
+                    bubble.appendChild(textPayload);
+                    streamBox.appendChild(bubble);
+                }
             });
             streamBox.scrollTop = streamBox.scrollHeight;
         }
@@ -231,18 +334,62 @@
 
             try {
                 await updateDoc(doc(db, "chatrooms", activeRoomIdentityCode), {
-                    messages: arrayUnion({ senderId: persistentSessionId, text: txt, timestamp: new Date().getTime() }),
+                    messages: arrayUnion({
+                        type: "user",
+                        senderId: persistentSessionId,
+                        senderName: savedClientProfileName,
+                        text: txt,
+                        timestamp: new Date().getTime()
+                    }),
                     updatedAt: new Date()
                 });
             } catch (err) { console.error("Error committing string payload packet:", err); }
         }
 
-        window.exitChatChannel = function() {
+        window.exitChatChannel = async function() {
             if (activeChatListenerUnsubscribe) { activeChatListenerUnsubscribe(); activeChatListenerUnsubscribe = null; }
+            
+            // Send exit message notice to document state history array before disconnecting view mappings
+            if (activeRoomIdentityCode) {
+                try {
+                    const roomRef = doc(db, "chatrooms", activeRoomIdentityCode);
+                    const docSnap = await getDoc(roomRef);
+                    if (docSnap.exists()) {
+                        const currentMembers = docSnap.data().activeMembersList || [];
+                        const updatedMembers = currentMembers.filter(id => id !== persistentSessionId);
+                        
+                        await updateDoc(roomRef, {
+                            activeMembersList: updatedMembers,
+                            messages: arrayUnion({
+                                type: "system",
+                                text: `${savedClientProfileName} left the room.`,
+                                timestamp: new Date().getTime()
+                            })
+                        });
+                    }
+                } catch(e) { console.error("Error pushing exit metadata log: ", e); }
+            }
+
             activeRoomIdentityCode = null;
             document.getElementById('chat-active-panel').classList.remove('active');
             document.getElementById('chat-setup-panel').classList.add('active');
             document.getElementById('chat-room-input').value = "";
+            
+            // Present prompt overlay setup options interface
+            document.getElementById('exit-share-popup').style.display = 'flex';
+        }
+
+        window.copyWebsiteInviteLink = function() {
+            const webAddressPath = window.location.origin + window.location.pathname.replace('chat.html', 'index.html');
+            navigator.clipboard.writeText(webAddressPath).then(() => {
+                alert("Website address path copied to clipboard panel dashboard successfully!");
+            }).catch(() => {
+                alert("Link: " + webAddressPath);
+            });
+        }
+
+        window.redirectToHubPortal = function() {
+            window.location.href = "index.html";
         }
     </script>
 </body>
