@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="tokenjpg Organic Solver - Class 11th & 12th organic chemistry reaction engine.">
+    <title>tokenjpg | Organic Chemistry Solver</title>
+    <style>
+        :root {
+            --bg-color: #060913;
+            --card-bg: rgba(16, 22, 41, 0.7);
+            --accent: #10b981; /* Premium Cyber Emerald */
+            --accent-glow: rgba(16, 185, 129, 0.25);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.06);
+            --btn-bg: rgba(255, 255, 255, 0.02);
+            --sidebar-width: 320px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 15% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* App Shell */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* --- Left Sidebar Component --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        /* Custom Compound Section */
+        .custom-creator {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .custom-creator h4 {
+            margin: 0 0 4px 0;
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .custom-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            outline: none;
+            flex-grow: 1;
+            box-sizing: border-box;
+        }
+
+        .custom-input:focus {
+            border-color: var(--accent);
+        }
+
+        .custom-select {
+            background: rgba(10, 15, 30, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            padding: 6px;
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-select:focus {
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .custom-add-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .custom-add-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* Pill Filters */
+        .filter-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: #000000;
+            font-weight: 700;
+            border-color: var(--accent);
+        }
+
+        .chem-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .chem-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chem-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .chem-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .chem-item:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.04);
+            transform: translateY(-1px);
+        }
+
+        .chem-name {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .chem-formula {
+            font-family: monospace;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* --- Workspace --- */
+        .workspace {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .workspace-header {
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .solver-logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 40%, #a7f3d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .solver-badge {
+            font-family: monospace;
+            font-size: 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            padding: 15px 40px 0 40px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--accent);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        /* Output & Sandbox Panels */
+        .panel-container {
+            flex-grow: 1;
+            padding: 20px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Reaction Sandbox */
+        .sandbox-area {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .selected-badge {
+            background: rgba(16, 185, 129, 0.12);
+            color: #fff;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-badge span {
+            cursor: pointer;
+            font-weight: bold;
+            color: #ef4444;
+            transition: transform 0.1s;
+        }
+
+        .selected-badge span:hover {
+            transform: scale(1.2);
+        }
+
+        .plus-sign {
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Theory Textarea */
+        .theory-textarea {
+            width: 100%;
+            height: 120px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: #fff;
+            padding: 16px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .theory-textarea:focus {
+            border-color: var(--accent);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            align-self: flex-start;
+            background: var(--accent);
+            color: #000000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px var(--accent-glow);
+            opacity: 0.95;
+        }
+
+        .action-btn:disabled {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Output Response Console */
+        .output-console {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            min-height: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .output-console strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        /* Loading Dots */
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+            font-size: 1.2rem;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: .2s; }
+        .loading-dots span:nth-child(3) { animation-delay: .4s; }
+
+        @keyframes blink {
+            0% { opacity: .2; }
+            20% { opacity: 1; }
+            100% { opacity: .2; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- --- Left Sidebar Component --- -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="back-link">
+                    <span>←</span> Hub Portal
+                </a>
+            </div>
+
+            <!-- --- NEW Custom Compound Creator UI --- -->
+            <div class="custom-creator">
+                <h4>Custom Reactant Creator</h4>
+                <div class="custom-row">
+                    <input type="text" id="customName" class="custom-input" placeholder="e.g. Propanol">
+                    <input type="text" id="customFormula" class="custom-input" placeholder="e.g. C3H7OH">
+                </div>
+                <div class="custom-row">
+                    <select id="customType" class="custom-select">
+                        <option value="organic">Organic</option>
+                        <option value="reagent">Reagents</option>
+                        <option value="inorganic">Inorganic</option>
+                    </select>
+                    <button class="custom-add-btn" onclick="addCustomCompound()">+ Add</button>
+                </div>
+            </div>
+
+            <input type="text" id="searchBar" class="search-box" placeholder="Search reactant/reagent..." oninput="filterChemicals()">
+            
+            <div class="filter-container">
+                <button class="filter-btn active" onclick="filterType('all')">All</button>
+                <button class="filter-btn" onclick="filterType('organic')">Organic</button>
+                <button class="filter-btn" onclick="filterType('reagent')">Reagents</button>
+                <button class="filter-btn" onclick="filterType('inorganic')">Inorganic</button>
+            </div>
+
+            <div class="chem-list" id="chemList"></div>
+        </aside>
+
+        <!-- --- Right Workspace --- -->
+        <main class="workspace">
+            <header class="workspace-header">
+                <div class="solver-logo">tokenjpg solver</div>
+                <div class="solver-badge">Pollinations Engine</div>
+            </header>
+
+            <nav class="tabs">
+                <button class="tab-btn active" onclick="switchTab('equation')">Equation Predictor</button>
+                <button class="tab-btn" onclick="switchTab('theory')">Theory Q&A Solver</button>
+            </nav>
+
+            <div class="panel-container">
+                <!-- Tab 1: Equation Predictor Panel -->
+                <div id="equation-panel" class="panel active">
+                    <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Select elements, compounds, or catalysts from the Reactants Library to load them into the sandbox:</p>
+                    <div class="sandbox-area" id="sandbox">
+                        <span style="color: var(--text-muted);" id="placeholder-text">Load items from the sidebar to predict their chemical outcome.</span>
+                    </div>
+                    <button id="predict-btn" class="action-btn" onclick="predictReaction()">Predict Reaction 🧪</button>
+                </div>
+
+                <!-- Tab 2: Theory Q&A Panel -->
+                <div id="theory-panel" class="panel">
+                    <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Ask any board conversion roadmap, mechanism, or Class 11 & 12 structural chemistry theory:</p>
+                    <textarea id="theoryQuestion" class="theory-textarea" placeholder="Explain why Phenol is more acidic than Ethanol, or describe the steps for Kolbe's synthesis..."></textarea>
+                    <button id="theory-btn" class="action-btn" onclick="solveTheory()">Consult Solver 🧠</button>
+                </div>
+
+                <!-- Shared Output Terminal -->
+                <div class="output-console" id="output-console">
+                    <strong>Resolution Output Terminal</strong>
+                    <div id="output-text" style="color: #e2e8f0;">Configure your reaction or type a query above to calculate properties. No credentials required.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Highly Custom Class 11th & 12th Chemical Index Database
+        const chemicalDb = [
+            // --- Aliphatic Organic Compounds ---
+            { name: "Methane", formula: "CH4", type: "organic" },
+            { name: "Ethane", formula: "C2H6", type: "organic" },
+            { name: "Ethene", formula: "C2H4", type: "organic" },
+            { name: "Ethyne", formula: "C2H2", type: "organic" },
+            { name: "Methanol", formula: "CH3OH", type: "organic" },
+            { name: "Ethanol", formula: "C2H5OH", type: "organic" },
+            { name: "Acetaldehyde", formula: "CH3CHO", type: "organic" },
+            { name: "Acetone", formula: "CH3COCH3", type: "organic" },
+            { name: "Acetic Acid", formula: "CH3COOH", type: "organic" },
+            
+            // --- Aromatic Organic Compounds ---
+            { name: "Benzene", formula: "C6H6", type: "organic" },
+            { name: "Toluene", formula: "C6H5CH3", type: "organic" },
+            { name: "Phenol", formula: "C6H5OH", type: "organic" },
+            { name: "Aniline", formula: "C6H5NH2", type: "organic" },
+            { name: "Benzene Diazonium Chloride", formula: "C6H5N2Cl", type: "organic" },
+            
+            // --- Reagents & Catalysts ---
+            { name: "Anhydrous AlCl3", formula: "AlCl3", type: "reagent" },
+            { name: "Acidified KMnO4", formula: "KMnO4/H+", type: "reagent" },
+            { name: "LiAlH4 (LAH)", formula: "LiAlH4", type: "reagent" },
+            { name: "Zinc Dust", formula: "Zn dust", type: "reagent" },
+            { name: "Aqueous NaOH", formula: "NaOH (aq)", type: "reagent" },
+            { name: "Alcoholic KOH", formula: "KOH (alc)", type: "reagent" },
+            { name: "Sodamide", formula: "NaNH2", type: "reagent" },
+            { name: "Sodium in Dry Ether", formula: "Na/Ether", type: "reagent" },
+
+            // --- Inorganic Elements & Acids ---
+            { name: "Water", formula: "H2O", type: "inorganic" },
+            { name: "Hydrochloric Acid", formula: "HCl", type: "inorganic" },
+            { name: "Sulphuric Acid", formula: "H2SO4", type: "inorganic" },
+            { name: "Nitric Acid", formula: "HNO3", type: "inorganic" },
+            { name: "Chlorine Gas", formula: "Cl2", type: "inorganic" },
+            { name: "Sodium Metal", formula: "Na", type: "inorganic" }
+        ];
+
+        let selectedReactants = [];
+        let currentFilter = 'all';
+
+        function renderList(items) {
+            const listEl = document.getElementById('chemList');
+            listEl.innerHTML = items.map(item => `
+                <div class="chem-item" onclick="addReactant('${item.formula}')">
+                    <span class="chem-name">${item.name}</span>
+                    <span class="chem-formula">${item.formula}</span>
+                </div>
+            `).join('');
+        }
+
+        // --- NEW Dynamic Addition Function ---
+        function addCustomCompound() {
+            const nameInput = document.getElementById('customName');
+            const formulaInput = document.getElementById('customFormula');
+            const typeSelect = document.getElementById('customType');
+
+            const name = nameInput.value.trim();
+            const formula = formulaInput.value.trim();
+            const type = typeSelect.value;
+
+            if (!name || !formula) {
+                alert("Please fill in both the Compound Name and Formula.");
+                return;
+            }
+
+            // Check if it already exists to prevent duplicate entries
+            const exists = chemicalDb.some(c => c.formula.toLowerCase() === formula.toLowerCase());
+            if (exists) {
+                alert("A compound with this formula already exists!");
+                return;
+            }
+
+            // Append new element to local memory database
+            chemicalDb.unshift({ name, formula, type });
+
+            // Clear inputs
+            nameInput.value = "";
+            formulaInput.value = "";
+
+            // Re-render and filter UI
+            filterChemicals();
+        }
+
+        function filterType(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Safely locate current target event trigger
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            filterChemicals();
+        }
+
+        function filterChemicals() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            let filtered = chemicalDb;
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(c => c.type === currentFilter);
+            }
+
+            if (query) {
+                filtered = filtered.filter(c => 
+                    c.name.toLowerCase().includes(query) || 
+                    c.formula.toLowerCase().includes(query)
+                );
+            }
+            renderList(filtered);
+        }
+
+        function addReactant(formula) {
+            if (!selectedReactants.includes(formula)) {
+                selectedReactants.push(formula);
+                updateSandbox();
+            }
+        }
+
+        function removeReactant(formula) {
+            selectedReactants = selectedReactants.filter(r => r !== formula);
+            updateSandbox();
+        }
+
+        function updateSandbox() {
+            const sandbox = document.getElementById('sandbox');
+            if (selectedReactants.length === 0) {
+                sandbox.innerHTML = `<span style="color: var(--text-muted);" id="placeholder-text">Load items from the sidebar to predict their chemical outcome.</span>`;
+                return;
+            }
+            sandbox.innerHTML = selectedReactants.map(r => `
+                <div class="selected-badge">
+                    ${r} <span onclick="removeReactant('${r}')">×</span>
+                </div>
+            `).join(' <div class="plus-sign">+</div> ');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if (tab === 'equation') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('equation-panel').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('theory-panel').classList.add('active');
+            }
+        }
+
+        // --- Core Pollinations API Interface Layer ---
+        async function runChemistryInference(systemInstructions, userPrompt, triggerButtonId) {
+            const outputText = document.getElementById('output-text');
+            const triggerBtn = document.getElementById(triggerButtonId);
+            
+            outputText.innerHTML = `<span class="loading-dots">Inference calculation active. Mapping molecular orbits<span>.</span><span>.</span><span>.</span></span>`;
+            triggerBtn.disabled = true;
+
+            const url = "https://text.pollinations.ai/";
+            const payload = {
+                messages: [
+                    { role: "system", content: systemInstructions },
+                    { role: "user", content: userPrompt }
+                ],
+                model: "qwen", // Highly capable model for code, chemistry, and step-by-step logic
+                jsonMode: false,
+                stream: false
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const text = await response.text();
+                    outputText.innerHTML = formatMarkdownOutput(text);
+                } else {
+                    outputText.innerHTML = `<span style="color: #ef4444;">Resolution Interrupted. Pollinations server returned status ${response.status}.</span>`;
+                }
+            } catch (err) {
+                console.error(err);
+                outputText.innerHTML = `<span style="color: #ef4444;">API Transport Failure. Verify your internet connection or GitHub Pages routing settings.</span>`;
+            } finally {
+                triggerBtn.disabled = false;
+            }
+        }
+
+        function predictReaction() {
+            if (selectedReactants.length === 0) return;
+
+            // UPDATED SYSTEM PROMPT: Teaches AI how to handle custom functional groups (e.g. C3H7OH vs C2H5OH)
+            const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Indian Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
+
+INSTRUCTIONS FOR CUSTOM/USER-DEFINED COMPOUNDS:
+The user can input standard or custom compounds (e.g., higher carbon chains or unique isomers). 
+Analyze their chemical formulas to identify functional groups (such as -OH for alcohols, -COOH for carboxylic acids, -CHO for aldehydes, etc.) and apply fundamental reaction mechanisms (e.g., esterification, nucleophilic substitution, Markovnikov/Saytzeff elimination, or redox reactions) dynamically.
+
+RULES:
+1. If no standard organic or inorganic reaction pathway is scientifically logical or possible under normal NCERT conditions with the selected reactants/reagents, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
+2. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, professional, and readable.`;
+
+            const prompt = `Solve the chemical equation when combining: ${selectedReactants.join(' + ')}`;
+            runChemistryInference(systemInstructions, prompt, 'predict-btn');
+        }
+
+        function solveTheory() {
+            const val = document.getElementById('theoryQuestion').value;
+            if (!val.trim()) return;
+
+            const systemInstructions = `You are the tokenjpg Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail intermediate structures (like carbocations or transition states) matching NCERT evaluation criteria. Keep answers focused and formatted cleanly.`;
+
+            runChemistryInference(systemInstructions, val, 'theory-btn');
+        }
+
+        // Custom Safe Markdown Parser to structure bold labels and code snippets beautifully
+        function formatMarkdownOutput(text) {
+            let html = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            
+            // Format Bold elements (**text**)
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Format code tags (`CH3-CH2-OH`)
+            html = html.replace(/`(.*?)`/g, '<code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: var(--accent);">$1</code>');
+            
+            return html;
+        }
+
+        // Render reactants on load
+        renderList(chemicalDb);
+    </script>
+</body>
+</html>
