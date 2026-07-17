@@ -699,7 +699,7 @@
 
                     <!-- Tab 2: Theory Q&A Panel -->
                     <div id="theory-panel" class="panel">
-                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; font-weight: 500;">Ask any board conversion roadmap, mechanism, or Class 11 & 12 structural theory:</p>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; font-weight: 500;">Ask any board conversion roadmap, mechanism, or Class 11 & 12 structural chemistry theory:</p>
                         <textarea id="theoryQuestion" class="theory-textarea" placeholder="Explain why Phenol is more acidic than Ethanol, or describe the structural steps for Kolbe's synthesis..."></textarea>
                         <button id="theory-btn" class="action-btn" onclick="solveTheory()">
                             Consult Academic Solver <span class="material-symbols-rounded">auto_awesome</span>
@@ -784,22 +784,17 @@
                 return;
             }
 
-            // Check if item already exists in the local DB array
             const exists = chemicalDb.some(c => c.formula.toLowerCase() === formula.toLowerCase());
             if (!exists) {
                 chemicalDb.unshift({ name, formula, type });
-                filterChemicals(); // re-filter and render structural updates
+                filterChemicals(); 
                 
-                // Reset fields
                 nameInput.value = '';
                 formulaInput.value = '';
             }
-            
-            // Automatically select it into the active workspace sandbox matrix
             addReactant(formula);
         }
 
-        // Fixed scoping by capturing native event context safely
         function filterType(type, e) {
             currentFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -880,13 +875,14 @@
                 </div>`;
             triggerBtn.disabled = true;
 
-            const url = "https://text.pollinations.ai/v1/chat/completions";
+            // NEW 2026 UNIFIED ENDPOINT PATH WITHOUT EMBEDDED PATH TYPOS
+            const url = "https://text.pollinations.ai/";
             const payload = {
                 messages: [
                     { role: "system", content: systemInstructions },
                     { role: "user", content: userPrompt }
                 ],
-                model: "qwen", 
+                model: "openai", 
                 jsonMode: false,
                 stream: false
             };
@@ -899,8 +895,7 @@
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    const text = data.choices[0].message.content;
+                    const text = await response.text();
                     outputText.innerHTML = formatMarkdownOutput(text);
                 } else {
                     outputText.innerHTML = `<span style="color: #ef4444; font-weight: 600;">Resolution Interrupted. Engine server returned status ${response.status}.</span>`;
@@ -916,7 +911,7 @@
         function predictReaction() {
             if (selectedReactants.length === 0) return;
 
-            const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Indian Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
+            const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
 RULES:
 1. If no reaction is standard/possible with the combined reactants, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
 2. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional.`;
@@ -946,7 +941,6 @@ RULES:
             return html;
         }
 
-        // Initial setup execution
         renderList(chemicalDb);
     </script>
 </body>
