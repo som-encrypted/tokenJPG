@@ -90,6 +90,74 @@
             background: rgba(16, 185, 129, 0.05);
         }
 
+        /* Custom Compound Injector Styles */
+        .injector-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .injector-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .injector-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .injector-input {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .injector-input:focus {
+            border-color: var(--accent-emerald);
+        }
+
+        .injector-select {
+            background: #131a2c;
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .injector-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: #042f1a;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .search-wrapper {
             position: relative;
             margin-bottom: 16px;
@@ -562,16 +630,35 @@
                 </a>
             </div>
 
+            <!-- Custom Compound Injector Section -->
+            <div class="injector-card">
+                <div class="injector-title">
+                    <span class="material-symbols-rounded" style="font-size: 1rem; color: var(--accent-emerald);">add_circle</span> Inject Custom Compound
+                </div>
+                <div class="injector-row">
+                    <input type="text" id="injName" class="injector-input" placeholder="Name (e.g., Methyl Chloride)">
+                    <input type="text" id="injFormula" class="injector-input" placeholder="Formula (e.g., CH3Cl)">
+                </div>
+                <div class="injector-row">
+                    <select id="injType" class="injector-select">
+                        <option value="organic">Organic</option>
+                        <option value="reagent">Reagent</option>
+                        <option value="inorganic">Inorganic</option>
+                    </select>
+                    <button class="injector-btn" onclick="injectCustomCompound()" style="flex-grow: 1;">Inject Matrix</button>
+                </div>
+            </div>
+
             <div class="search-wrapper">
                 <span class="material-symbols-rounded">search</span>
                 <input type="text" id="searchBar" class="search-box" placeholder="Search parameters..." oninput="filterChemicals()">
             </div>
             
             <div class="filter-container">
-                <button class="filter-btn active" onclick="filterType('all')">All Library</button>
-                <button class="filter-btn" onclick="filterType('organic')">Organic</button>
-                <button class="filter-btn" onclick="filterType('reagent')">Reagents</button>
-                <button class="filter-btn" onclick="filterType('inorganic')">Inorganic</button>
+                <button class="filter-btn active" onclick="filterType('all', event)">All Library</button>
+                <button class="filter-btn" onclick="filterType('organic', event)">Organic</button>
+                <button class="filter-btn" onclick="filterType('reagent', event)">Reagents</button>
+                <button class="filter-btn" onclick="filterType('inorganic', event)">Inorganic</button>
             </div>
 
             <div class="chem-list" id="chemList"></div>
@@ -682,10 +769,43 @@
             `).join('');
         }
 
-        function filterType(type) {
+        // Custom Injector Logic
+        function injectCustomCompound() {
+            const nameInput = document.getElementById('injName');
+            const formulaInput = document.getElementById('injFormula');
+            const typeInput = document.getElementById('injType');
+
+            const name = nameInput.value.trim();
+            const formula = formulaInput.value.trim();
+            const type = typeInput.value;
+
+            if (!name || !formula) {
+                alert("Please fill both compound name and molecular formula parameters.");
+                return;
+            }
+
+            // Check if item already exists in the local DB array
+            const exists = chemicalDb.some(c => c.formula.toLowerCase() === formula.toLowerCase());
+            if (!exists) {
+                chemicalDb.unshift({ name, formula, type });
+                filterChemicals(); // re-filter and render structural updates
+                
+                // Reset fields
+                nameInput.value = '';
+                formulaInput.value = '';
+            }
+            
+            // Automatically select it into the active workspace sandbox matrix
+            addReactant(formula);
+        }
+
+        // Fixed scoping by capturing native event context safely
+        function filterType(type, e) {
             currentFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('active');
+            }
             filterChemicals();
         }
 
@@ -760,7 +880,6 @@
                 </div>`;
             triggerBtn.disabled = true;
 
-            // FIX: Targeted chat completions routing endpoint
             const url = "https://text.pollinations.ai/v1/chat/completions";
             const payload = {
                 messages: [
