@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="tokenjpg Organic Solver - Premium Class 11th & 12th organic chemistry reaction engine.">
     <title>tokenjpg | Organic Chemistry Solver</title>
-    
-    <!-- External Fonts & Icons -->
+    <!-- Inter Font & Google Icons for clean imagery -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     
     <!-- MathJax Configuration -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-            svg: { fontCache: 'global' }
-        };
+      window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        svg: { fontCache: 'global' }
+      };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
     
     <style>
         :root {
@@ -32,11 +31,16 @@
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --text-dim: #64748b;
+            --border-glow: rgba(16, 185, 129, 0.15);
             --border-line: rgba(255, 255, 255, 0.05);
             --sidebar-width: 340px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -45,93 +49,680 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 80% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
         }
 
-        .app-container { display: flex; width: 100%; height: 100vh; }
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
 
-        /* Sidebar Styling */
-        .sidebar { width: var(--sidebar-width); background: #0e1322; border-right: 1px solid var(--border-line); display: flex; flex-direction: column; padding: 24px; z-index: 10; }
-        .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-        .back-link { text-decoration: none; color: var(--text-secondary); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-line); }
+        /* --- Left Sidebar UI --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0e1322;
+            border-right: 1px solid var(--border-line);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            z-index: 10;
+        }
 
-        .injector-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-line); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .injector-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .injector-row { display: flex; gap: 8px; }
-        .injector-input { flex-grow: 1; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-line); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem; outline: none; }
-        .injector-select { background: #131a2c; border: 1px solid var(--border-line); border-radius: 8px; padding: 8px; color: var(--text-secondary); font-size: 0.8rem; }
-        .injector-btn { background: var(--accent-emerald); border: none; color: #042f1a; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
 
-        .search-wrapper { position: relative; margin-bottom: 16px; }
-        .search-box { width: 100%; padding: 12px 12px 12px 40px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-line); border-radius: 12px; color: white; outline: none; }
+        .back-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: color 0.2s, transform 0.2s;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-line);
+        }
 
-        .filter-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 20px; }
-        .filter-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-line); color: var(--text-secondary); padding: 8px; border-radius: 8px; cursor: pointer; }
-        .filter-btn.active { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); }
+        .back-link:hover {
+            color: var(--accent-emerald);
+            transform: translateX(-2px);
+            background: rgba(16, 185, 129, 0.05);
+        }
 
-        .chem-list { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .chem-item { background: var(--bg-surface); border: 1px solid var(--border-line); padding: 12px 16px; border-radius: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .chem-formula { font-family: 'JetBrains Mono', monospace; color: var(--accent-emerald); font-size: 0.8rem; background: rgba(16, 185, 129, 0.06); padding: 4px 8px; border-radius: 6px; }
+        /* Custom Compound Injector Styles */
+        .injector-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-        /* Workspace Layout */
-        .workspace { flex-grow: 1; display: flex; flex-direction: column; background: var(--bg-deep); }
-        .workspace-header { padding: 24px 40px; border-bottom: 1px solid var(--border-line); display: flex; justify-content: space-between; background: #0e1322; }
-        .solver-logo { font-size: 1.4rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .tabs { display: flex; gap: 8px; padding: 20px 40px 0 40px; }
-        .tab-btn { background: none; border: 1px solid transparent; color: var(--text-secondary); padding: 10px 20px; border-radius: 10px 10px 0 0; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .tab-btn.active { background: var(--bg-surface); color: var(--accent-blue); border: 1px solid var(--border-line); border-bottom-color: var(--bg-surface); }
+        .injector-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        .panel-container { flex-grow: 1; padding: 0 40px 40px 40px; overflow-y: auto; }
-        .panel-wrapper-card { background: var(--bg-surface); border: 1px solid var(--border-line); border-radius: 0 16px 16px 16px; padding: 32px; display: flex; flex-direction: column; gap: 24px; }
-        .panel { display: none; }
-        .panel.active { display: flex; flex-direction: column; gap: 20px; }
+        .injector-row {
+            display: flex;
+            gap: 8px;
+        }
 
-        .sandbox-area { background: rgba(7, 10, 19, 0.4); border: 2px dashed rgba(255, 255, 255, 0.06); border-radius: 14px; padding: 30px; min-height: 110px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
-        .selected-badge { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 8px 16px; border-radius: 30px; display: flex; align-items: center; gap: 10px; }
-        
-        .theory-textarea { width: 100%; height: 130px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-line); border-radius: 12px; color: #fff; padding: 16px; font-family: inherit; resize: none; }
-        .action-btn { background: var(--accent-emerald); color: #042f1a; border: none; padding: 14px 28px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .injector-input {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
 
-        .output-console { background: #090d16; border: 1px solid var(--border-line); border-radius: 14px; padding: 24px; line-height: 1.7; min-height: 200px; }
-        .loading-dots { display: flex; align-items: center; gap: 4px; color: var(--text-secondary); }
+        .injector-input:focus {
+            border-color: var(--accent-emerald);
+        }
+
+        .injector-select {
+            background: #131a2c;
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .injector-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: #042f1a;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-wrapper .material-symbols-rounded {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 1.2rem;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Pill Filters Grid */
+        .filter-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-line);
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            font-weight: 600;
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        /* Library List items */
+        .chem-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .chem-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .chem-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        .chem-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-line);
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chem-item:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: var(--bg-surface-hover);
+            transform: scale(1.01);
+        }
+
+        .chem-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .chem-name {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .chem-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+        }
+
+        .chem-formula {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-emerald);
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.06);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* --- Workspace Layout --- */
+        .workspace {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: var(--bg-deep);
+        }
+
+        .workspace-header {
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--border-line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #0e1322;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .solver-logo {
+            font-size: 1.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .solver-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--accent-emerald);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 20px 40px 0 40px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-surface);
+            color: var(--accent-blue);
+            border: 1px solid var(--border-line);
+            border-bottom-color: var(--bg-surface);
+        }
+
+        /* Interactive Sandbox Container Panels */
+        .panel-container {
+            flex-grow: 1;
+            padding: 0 40px 40px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .panel-wrapper-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-line);
+            border-radius: 0 16px 16px 16px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Equation Visual Sandbox Area */
+        .sandbox-area {
+            background: rgba(7, 10, 19, 0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 30px 24px;
+            min-height: 110px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .sandbox-area.has-items {
+            border-style: solid;
+            border-color: rgba(16, 185, 129, 0.15);
+            background: rgba(7, 10, 19, 0.6);
+        }
+
+        .selected-badge {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .selected-badge span.remove-cross {
+            cursor: pointer;
+            font-weight: 800;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            transition: all 0.15s;
+        }
+
+        .selected-badge span.remove-cross:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .plus-sign {
+            color: var(--text-dim);
+            font-weight: 500;
+            font-size: 1.3rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Theory Textarea Form Elements */
+        .theory-textarea {
+            width: 100%;
+            height: 130px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            color: #fff;
+            padding: 16px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            line-height: 1.5;
+        }
+
+        .theory-textarea:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Action Buttons styling */
+        .action-btn {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #042f1a;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .action-btn:disabled {
+            background: rgba(255,255,255,0.03) !important;
+            color: var(--text-dim) !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        #theory-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.2);
+        }
+        #theory-btn:hover {
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        /* --- Terminal Console Output Module --- */
+        .output-console {
+            background: #090d16;
+            border: 1px solid var(--border-line);
+            border-radius: 14px;
+            padding: 24px;
+            min-height: 200px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            position: relative;
+        }
+
+        .console-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .console-title {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .console-status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--accent-emerald);
+        }
+
+        .output-text-content {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        /* Advanced NCERT Formatted Output Elements */
+        .output-text-content strong {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .output-text-content code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255,255,255,0.04); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            color: var(--accent-emerald);
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        /* Loading UI Animation */
+        .loading-dots {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            animation: pulse 1.2s infinite ease-in-out;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent-purple); }
+        .dot:nth-child(3) { animation-delay: 0.4s; background: var(--accent-emerald); }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.6); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        
+        <!-- --- Sidebar Library Module --- -->
         <aside class="sidebar">
-            <div class="sidebar-header"><a href="#" class="back-link">Hub Portal</a></div>
+            <div class="sidebar-header">
+                <a href="index.html" class="back-link">
+                    <span class="material-symbols-rounded" style="font-size: 1rem;">grid_view</span> Hub Portal
+                </a>
+            </div>
+
+            <!-- Custom Compound Injector Section -->
             <div class="injector-card">
-                <div class="injector-title">Inject Custom Compound</div>
-                <div class="injector-row"><input type="text" id="injName" class="injector-input" placeholder="Name"><input type="text" id="injFormula" class="injector-input" placeholder="Formula"></div>
-                <div class="injector-row"><select id="injType" class="injector-select"><option value="organic">Organic</option><option value="reagent">Reagent</option></select><button class="injector-btn" onclick="injectCustomCompound()">Inject</button></div>
+                <div class="injector-title">
+                    <span class="material-symbols-rounded" style="font-size: 1rem; color: var(--accent-emerald);">add_circle</span> Inject Custom Compound
+                </div>
+                <div class="injector-row">
+                    <input type="text" id="injName" class="injector-input" placeholder="Name (e.g., Methyl Chloride)">
+                    <input type="text" id="injFormula" class="injector-input" placeholder="Formula (e.g., CH3Cl)">
+                </div>
+                <div class="injector-row">
+                    <select id="injType" class="injector-select">
+                        <option value="organic">Organic</option>
+                        <option value="reagent">Reagent</option>
+                        <option value="inorganic">Inorganic</option>
+                    </select>
+                    <button class="injector-btn" onclick="injectCustomCompound()" style="flex-grow: 1;">Inject Matrix</button>
+                </div>
             </div>
-            <div class="search-wrapper"><input type="text" id="searchBar" class="search-box" placeholder="Search..." oninput="filterChemicals()"></div>
+
+            <div class="search-wrapper">
+                <span class="material-symbols-rounded">search</span>
+                <input type="text" id="searchBar" class="search-box" placeholder="Search parameters..." oninput="filterChemicals()">
+            </div>
+            
             <div class="filter-container">
-                <button class="filter-btn active" onclick="filterType('all', event)">All</button>
+                <button class="filter-btn active" onclick="filterType('all', event)">All Library</button>
                 <button class="filter-btn" onclick="filterType('organic', event)">Organic</button>
+                <button class="filter-btn" onclick="filterType('reagent', event)">Reagents</button>
+                <button class="filter-btn" onclick="filterType('inorganic', event)">Inorganic</button>
             </div>
+
             <div class="chem-list" id="chemList"></div>
         </aside>
 
+        <!-- --- Workspace Layout --- -->
         <main class="workspace">
-            <header class="workspace-header"><div class="solver-logo">tokenjpg solver</div></header>
+            <header class="workspace-header">
+                <div class="logo-group">
+                    <div class="solver-logo">tokenjpg solver</div>
+                    <div class="solver-badge">
+                        <span class="console-status-dot"></span> Core Inference Engine
+                    </div>
+                </div>
+            </header>
+
             <nav class="tabs">
-                <button class="tab-btn active" onclick="switchTab('equation')">Equation Predictor</button>
-                <button class="tab-btn" onclick="switchTab('theory')">Theory Q&A</button>
+                <button class="tab-btn active" onclick="switchTab('equation')">
+                    <span class="material-symbols-rounded">science</span> Equation Predictor
+                </button>
+                <button class="tab-btn" onclick="switchTab('theory')">
+                    <span class="material-symbols-rounded">psychology</span> Theory Q&A Solver
+                </button>
             </nav>
+
             <div class="panel-container">
                 <div class="panel-wrapper-card">
+                    <!-- Tab 1: Equation Predictor Panel -->
                     <div id="equation-panel" class="panel active">
-                        <div class="sandbox-area" id="sandbox">Load items to predict.</div>
-                        <button class="action-btn" onclick="predictReaction()">Predict Matrix</button>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; font-weight: 500;">Select compounds or catalysts from the sidebar to assemble your reaction parameters:</p>
+                        <div class="sandbox-area" id="sandbox">
+                            <span style="color: var(--text-dim); font-size: 0.9rem;" id="placeholder-text">Load items from the library to predict molecular outcomes.</span>
+                        </div>
+                        <button id="predict-btn" class="action-btn" onclick="predictReaction()">
+                            Predict Reaction Matrix <span class="material-symbols-rounded">bolt</span>
+                        </button>
                     </div>
+
+                    <!-- Tab 2: Theory Q&A Panel -->
                     <div id="theory-panel" class="panel">
-                        <textarea id="theoryQuestion" class="theory-textarea"></textarea>
-                        <button class="action-btn" onclick="solveTheory()">Consult Solver</button>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; font-weight: 500;">Ask any board conversion roadmap, mechanism, or Class 11 & 12 structural chemistry theory:</p>
+                        <textarea id="theoryQuestion" class="theory-textarea" placeholder="Explain why Phenol is more acidic than Ethanol, or describe the structural steps for Kolbe's synthesis..."></textarea>
+                        <button id="theory-btn" class="action-btn" onclick="solveTheory()">
+                            Consult Academic Solver <span class="material-symbols-rounded">auto_awesome</span>
+                        </button>
                     </div>
+
+                    <!-- Shared Output Terminal -->
                     <div class="output-console">
-                        <div id="output-text" class="output-text-content">Results will appear here.</div>
+                        <div class="console-banner">
+                            <div class="console-title">
+                                <span class="material-symbols-rounded" style="font-size: 1.1rem; color: var(--accent-blue);">terminal</span> Resolution Output Terminal
+                            </div>
+                        </div>
+                        <div id="output-text" class="output-text-content">Configure your reaction matrix parameters or submit an active structural chemistry question above to initiate inference computation.</div>
                     </div>
                 </div>
             </div>
@@ -139,10 +730,36 @@
     </div>
 
     <script>
+        // High-fidelity Class 11th & 12th Chemical Index Database
         const chemicalDb = [
             { name: "Methane", formula: "CH4", type: "organic" },
             { name: "Ethane", formula: "C2H6", type: "organic" },
-            { name: "Ethanol", formula: "C2H5OH", type: "organic" }
+            { name: "Ethene", formula: "C2H4", type: "organic" },
+            { name: "Ethyne", formula: "C2H2", type: "organic" },
+            { name: "Methanol", formula: "CH3OH", type: "organic" },
+            { name: "Ethanol", formula: "C2H5OH", type: "organic" },
+            { name: "Acetaldehyde", formula: "CH3CHO", type: "organic" },
+            { name: "Acetone", formula: "CH3COCH3", type: "organic" },
+            { name: "Acetic Acid", formula: "CH3COOH", type: "organic" },
+            { name: "Benzene", formula: "C6H6", type: "organic" },
+            { name: "Toluene", formula: "C6H5CH3", type: "organic" },
+            { name: "Phenol", formula: "C6H5OH", type: "organic" },
+            { name: "Aniline", formula: "C6H5NH2", type: "organic" },
+            { name: "Benzene Diazonium Chloride", formula: "C6H5N2Cl", type: "organic" },
+            { name: "Anhydrous AlCl3", formula: "AlCl3", type: "reagent" },
+            { name: "Acidified KMnO4", formula: "KMnO4/H+", type: "reagent" },
+            { name: "LiAlH4 (LAH)", formula: "LiAlH4", type: "reagent" },
+            { name: "Zinc Dust", formula: "Zn dust", type: "reagent" },
+            { name: "Aqueous NaOH", formula: "NaOH (aq)", type: "reagent" },
+            { name: "Alcoholic KOH", formula: "KOH (alc)", type: "reagent" },
+            { name: "Sodamide", formula: "NaNH2", type: "reagent" },
+            { name: "Sodium in Dry Ether", formula: "Na/Ether", type: "reagent" },
+            { name: "Water", formula: "H2O", type: "inorganic" },
+            { name: "Hydrochloric Acid", formula: "HCl", type: "inorganic" },
+            { name: "Sulphuric Acid", formula: "H2SO4", type: "inorganic" },
+            { name: "Nitric Acid", formula: "HNO3", type: "inorganic" },
+            { name: "Chlorine Gas", formula: "Cl2", type: "inorganic" },
+            { name: "Sodium Metal", formula: "Na", type: "inorganic" }
         ];
 
         let selectedReactants = [];
@@ -152,66 +769,190 @@
             const listEl = document.getElementById('chemList');
             listEl.innerHTML = items.map(item => `
                 <div class="chem-item" onclick="addReactant('${item.formula}')">
-                    <span class="chem-name">${item.name}</span>
+                    <div class="chem-info">
+                        <span class="chem-name">${item.name}</span>
+                        <span class="chem-tag">${item.type}</span>
+                    </div>
                     <span class="chem-formula">${item.formula}</span>
                 </div>
             `).join('');
         }
 
+        // Custom Injector Logic
+        function injectCustomCompound() {
+            const nameInput = document.getElementById('injName');
+            const formulaInput = document.getElementById('injFormula');
+            const typeInput = document.getElementById('injType');
+
+            const name = nameInput.value.trim();
+            const formula = formulaInput.value.trim();
+            const type = typeInput.value;
+
+            if (!name || !formula) {
+                alert("Please fill both compound name and molecular formula parameters.");
+                return;
+            }
+
+            const exists = chemicalDb.some(c => c.formula.toLowerCase() === formula.toLowerCase());
+            if (!exists) {
+                chemicalDb.unshift({ name, formula, type });
+                filterChemicals(); 
+                
+                nameInput.value = '';
+                formulaInput.value = '';
+            }
+            addReactant(formula);
+        }
+
+        function filterType(type, e) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (e && e.currentTarget) {
+                e.currentTarget.classList.add('active');
+            }
+            filterChemicals();
+        }
+
+        function filterChemicals() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            let filtered = chemicalDb;
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(c => c.type === currentFilter);
+            }
+
+            if (query) {
+                filtered = filtered.filter(c => 
+                    c.name.toLowerCase().includes(query) || 
+                    c.formula.toLowerCase().includes(query)
+                );
+            }
+            renderList(filtered);
+        }
+
+        function addReactant(formula) {
+            if (!selectedReactants.includes(formula)) {
+                selectedReactants.push(formula);
+                updateSandbox();
+            }
+        }
+
+        function removeReactant(formula) {
+            selectedReactants = selectedReactants.filter(r => r !== formula);
+            updateSandbox();
+        }
+
+        function updateSandbox() {
+            const sandbox = document.getElementById('sandbox');
+            if (selectedReactants.length === 0) {
+                sandbox.classList.remove('has-items');
+                sandbox.innerHTML = `<span style="color: var(--text-dim); font-size: 0.9rem;" id="placeholder-text">Load items from the library to predict molecular outcomes.</span>`;
+                return;
+            }
+            sandbox.classList.add('has-items');
+            sandbox.innerHTML = selectedReactants.map(r => `
+                <div class="selected-badge">
+                    ${r} <span class="remove-cross" onclick="removeReactant('${r}')">×</span>
+                </div>
+            `).join(' <div class="plus-sign">+</div> ');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if (tab === 'equation') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('equation-panel').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('theory-panel').classList.add('active');
+            }
+        }
+
+        // --- Core Fixed Pollinations Endpoint Integration ---
         async function runChemistryInference(systemInstructions, userPrompt, triggerButtonId) {
             const outputText = document.getElementById('output-text');
-            outputText.innerHTML = "Processing...";
+            const triggerBtn = document.getElementById(triggerButtonId);
             
+            outputText.innerHTML = `
+                <div class="loading-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <span style="margin-left: 8px;">Mapping molecular orbits & structural pathways...</span>
+                </div>`;
+            triggerBtn.disabled = true;
+
+            const url = "https://text.pollinations.ai/";
             const payload = {
-                messages: [{ role: "system", content: systemInstructions }, { role: "user", content: userPrompt }],
-                model: "openai"
+                messages: [
+                    { role: "system", content: systemInstructions },
+                    { role: "user", content: userPrompt }
+                ],
+                model: "openai", 
+                jsonMode: false,
+                stream: false
             };
 
             try {
-                const response = await fetch("https://text.pollinations.ai/", {
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                const text = await response.text();
-                outputText.innerHTML = formatMarkdownOutput(text);
-                
-                // Trigger MathJax re-render
-                if (window.MathJax) {
-                    MathJax.typesetPromise();
+
+                if (response.ok) {
+                    const text = await response.text();
+                    outputText.innerHTML = formatMarkdownOutput(text);
+                    // Trigger MathJax to typeset the content
+                    if (window.MathJax) MathJax.typesetPromise([document.getElementById('output-text')]);
+                } else {
+                    outputText.innerHTML = `<span style="color: #ef4444; font-weight: 600;">Resolution Interrupted. Engine server returned status ${response.status}.</span>`;
                 }
             } catch (err) {
-                outputText.innerText = "Error: API connection failed.";
+                console.error(err);
+                outputText.innerHTML = `<span style="color: #ef4444; font-weight: 600;">API Transport Failure. Verify network routing settings.</span>`;
+            } finally {
+                triggerBtn.disabled = false;
             }
         }
 
-        function formatMarkdownOutput(text) {
-            // Converts basic bold and code tags
-            let html = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/`(.*?)`/g, '<code>$1</code>');
-            return html;
-        }
-
-        function addReactant(formula) { if (!selectedReactants.includes(formula)) { selectedReactants.push(formula); updateSandbox(); } }
-        
-        function updateSandbox() {
-            document.getElementById('sandbox').innerHTML = selectedReactants.map(r => `
-                <div class="selected-badge">${r}</div>`).join('');
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id.includes(tab)));
-        }
-
         function predictReaction() {
-            const prompt = `Predict the reaction for: ${selectedReactants.join(' + ')}. Use MathJax for formulas (e.g., $CH_3CH_2OH$).`;
-            runChemistryInference("You are a chemistry tutor.", prompt, 'predict-btn');
+            if (selectedReactants.length === 0) return;
+
+            const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
+RULES:
+1. If no reaction is standard/possible with the combined reactants, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
+2. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional. Use LaTeX delimiters like $...$ for all chemical formulas and equations.`;
+
+            const prompt = `Predict the balanced equation outcome for: ${selectedReactants.join(' + ')}`;
+            runChemistryInference(systemInstructions, prompt, 'predict-btn');
         }
 
         function solveTheory() {
             const val = document.getElementById('theoryQuestion').value;
-            runChemistryInference("You are a chemistry tutor.", val, 'theory-btn');
+            if (!val.trim()) return;
+
+            const systemInstructions = `You are the tokenjpg Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail intermediate structures (like carbocations or transition states) matching NCERT evaluation criteria. Keep answers focused and formatted cleanly. Use LaTeX delimiters like $...$ for all mathematical functions and chemical formulas.`;
+
+            runChemistryInference(systemInstructions, val, 'theory-btn');
+        }
+
+        // Custom Safe Formatter
+        function formatMarkdownOutput(text) {
+            // Escape HTML but preserve LaTeX placeholders
+            let html = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            
+            // Restore LaTeX delimiters that were escaped by &lt;/&gt;
+            html = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>'); 
+            
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+            return html;
         }
 
         renderList(chemicalDb);
