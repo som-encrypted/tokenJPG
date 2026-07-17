@@ -20,26 +20,6 @@
       };
     </script>
     
-    <!-- WebLLM Library -->
-    <script type="module">
-        import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
-        
-        let engine;
-        async function initEngine() {
-            const outputText = document.getElementById('output-text');
-            outputText.innerText = "Initializing local AI engine (this may take a moment)...";
-            
-            // Using a worker-based engine for local browser inference
-            const worker = new Worker(new URL('worker.js', import.meta.url), { type: 'module' });
-            engine = await CreateWebWorkerMLCEngine(worker, "Llama-3-8B-Instruct-q4f32_1-MLC");
-            outputText.innerText = "Engine ready. Configure your reaction matrix parameters.";
-        }
-        initEngine();
-
-        // Export to window for global access
-        window.getEngine = () => engine;
-    </script>
-    
     <style>
         :root {
             --bg-deep: #0b0f19;
@@ -119,6 +99,7 @@
             background: rgba(16, 185, 129, 0.05);
         }
 
+        /* Custom Compound Injector Styles */
         .injector-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-line);
@@ -217,6 +198,7 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
+        /* Pill Filters Grid */
         .filter-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -252,6 +234,7 @@
             border-color: rgba(59, 130, 246, 0.4);
         }
 
+        /* Library List items */
         .chem-list {
             flex-grow: 1;
             overflow-y: auto;
@@ -316,6 +299,7 @@
             border-radius: 6px;
         }
 
+        /* --- Workspace Layout --- */
         .workspace {
             flex-grow: 1;
             display: flex;
@@ -395,6 +379,7 @@
             border-bottom-color: var(--bg-surface);
         }
 
+        /* Interactive Sandbox Container Panels */
         .panel-container {
             flex-grow: 1;
             padding: 0 40px 40px 40px;
@@ -425,6 +410,7 @@
             gap: 20px;
         }
 
+        /* Equation Visual Sandbox Area */
         .sandbox-area {
             background: rgba(7, 10, 19, 0.4);
             border: 2px dashed rgba(255, 255, 255, 0.06);
@@ -492,6 +478,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
+        /* Theory Textarea Form Elements */
         .theory-textarea {
             width: 100%;
             height: 130px;
@@ -513,6 +500,7 @@
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
         }
 
+        /* Action Buttons styling */
         .action-btn {
             align-self: flex-start;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -552,6 +540,7 @@
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
         }
 
+        /* --- Terminal Console Output Module --- */
         .output-console {
             background: #090d16;
             border: 1px solid var(--border-line);
@@ -597,6 +586,7 @@
             font-size: 0.95rem;
         }
 
+        /* Advanced NCERT Formatted Output Elements */
         .output-text-content strong {
             color: #60a5fa;
             font-weight: 600;
@@ -612,6 +602,7 @@
             border: 1px solid rgba(255,255,255,0.02);
         }
 
+        /* Loading UI Animation */
         .loading-dots {
             display: flex;
             align-items: center;
@@ -640,6 +631,7 @@
 
     <div class="app-container">
         
+        <!-- --- Sidebar Library Module --- -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="index.html" class="back-link">
@@ -647,6 +639,7 @@
                 </a>
             </div>
 
+            <!-- Custom Compound Injector Section -->
             <div class="injector-card">
                 <div class="injector-title">
                     <span class="material-symbols-rounded" style="font-size: 1rem; color: var(--accent-emerald);">add_circle</span> Inject Custom Compound
@@ -680,12 +673,13 @@
             <div class="chem-list" id="chemList"></div>
         </aside>
 
+        <!-- --- Workspace Layout --- -->
         <main class="workspace">
             <header class="workspace-header">
                 <div class="logo-group">
                     <div class="solver-logo">tokenjpg solver</div>
                     <div class="solver-badge">
-                        <span class="console-status-dot"></span> Local Inference Engine (WebLLM)
+                        <span class="console-status-dot"></span> Core Inference Engine
                     </div>
                 </div>
             </header>
@@ -701,6 +695,7 @@
 
             <div class="panel-container">
                 <div class="panel-wrapper-card">
+                    <!-- Tab 1: Equation Predictor Panel -->
                     <div id="equation-panel" class="panel active">
                         <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; font-weight: 500;">Select compounds or catalysts from the sidebar to assemble your reaction parameters:</p>
                         <div class="sandbox-area" id="sandbox">
@@ -711,6 +706,7 @@
                         </button>
                     </div>
 
+                    <!-- Tab 2: Theory Q&A Panel -->
                     <div id="theory-panel" class="panel">
                         <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; font-weight: 500;">Ask any board conversion roadmap, mechanism, or Class 11 & 12 structural chemistry theory:</p>
                         <textarea id="theoryQuestion" class="theory-textarea" placeholder="Explain why Phenol is more acidic than Ethanol, or describe the structural steps for Kolbe's synthesis..."></textarea>
@@ -719,13 +715,14 @@
                         </button>
                     </div>
 
+                    <!-- Shared Output Terminal -->
                     <div class="output-console">
                         <div class="console-banner">
                             <div class="console-title">
                                 <span class="material-symbols-rounded" style="font-size: 1.1rem; color: var(--accent-blue);">terminal</span> Resolution Output Terminal
                             </div>
                         </div>
-                        <div id="output-text" class="output-text-content">Initializing engine...</div>
+                        <div id="output-text" class="output-text-content">Configure your reaction matrix parameters or submit an active structural chemistry question above to initiate inference computation.</div>
                     </div>
                 </div>
             </div>
@@ -733,6 +730,7 @@
     </div>
 
     <script>
+        // High-fidelity Class 11th & 12th Chemical Index Database
         const chemicalDb = [
             { name: "Methane", formula: "CH4", type: "organic" },
             { name: "Ethane", formula: "C2H6", type: "organic" },
@@ -780,10 +778,12 @@
             `).join('');
         }
 
+        // Custom Injector Logic
         function injectCustomCompound() {
             const nameInput = document.getElementById('injName');
             const formulaInput = document.getElementById('injFormula');
             const typeInput = document.getElementById('injType');
+
             const name = nameInput.value.trim();
             const formula = formulaInput.value.trim();
             const type = typeInput.value;
@@ -792,10 +792,12 @@
                 alert("Please fill both compound name and molecular formula parameters.");
                 return;
             }
+
             const exists = chemicalDb.some(c => c.formula.toLowerCase() === formula.toLowerCase());
             if (!exists) {
                 chemicalDb.unshift({ name, formula, type });
                 filterChemicals(); 
+                
                 nameInput.value = '';
                 formulaInput.value = '';
             }
@@ -814,9 +816,16 @@
         function filterChemicals() {
             const query = document.getElementById('searchBar').value.toLowerCase();
             let filtered = chemicalDb;
-            if (currentFilter !== 'all') filtered = filtered.filter(c => c.type === currentFilter);
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(c => c.type === currentFilter);
+            }
+
             if (query) {
-                filtered = filtered.filter(c => c.name.toLowerCase().includes(query) || c.formula.toLowerCase().includes(query));
+                filtered = filtered.filter(c => 
+                    c.name.toLowerCase().includes(query) || 
+                    c.formula.toLowerCase().includes(query)
+                );
             }
             renderList(filtered);
         }
@@ -851,6 +860,7 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
             if (tab === 'equation') {
                 document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
                 document.getElementById('equation-panel').classList.add('active');
@@ -860,29 +870,49 @@
             }
         }
 
-        // Updated local WebLLM Inference function
-        async function runLocalInference(systemInstructions, userPrompt, triggerButtonId) {
+        // --- Core Fixed Pollinations Endpoint Integration ---
+        async function runChemistryInference(systemInstructions, userPrompt, triggerButtonId) {
             const outputText = document.getElementById('output-text');
             const triggerBtn = document.getElementById(triggerButtonId);
             
-            outputText.innerHTML = `<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+            outputText.innerHTML = `
+                <div class="loading-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <span style="margin-left: 8px;">Mapping molecular orbits & structural pathways...</span>
+                </div>`;
             triggerBtn.disabled = true;
 
+            const url = "https://text.pollinations.ai/";
+            const payload = {
+                messages: [
+                    { role: "system", content: systemInstructions },
+                    { role: "user", content: userPrompt }
+                ],
+                model: "openai", 
+                jsonMode: false,
+                stream: false
+            };
+
             try {
-                const engine = window.getEngine();
-                const completion = await engine.chat.completions.create({
-                    messages: [
-                        { role: "system", content: systemInstructions },
-                        { role: "user", content: userPrompt }
-                    ]
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
 
-                const content = completion.choices[0].message.content;
-                outputText.innerHTML = formatMarkdownOutput(content);
-                if (window.MathJax) MathJax.typesetPromise([document.getElementById('output-text')]);
+                if (response.ok) {
+                    const text = await response.text();
+                    outputText.innerHTML = formatMarkdownOutput(text);
+                    // Trigger MathJax to typeset the content
+                    if (window.MathJax) MathJax.typesetPromise([document.getElementById('output-text')]);
+                } else {
+                    outputText.innerHTML = `<span style="color: #ef4444; font-weight: 600;">Resolution Interrupted. Engine server returned status ${response.status}.</span>`;
+                }
             } catch (err) {
                 console.error(err);
-                outputText.innerHTML = `Inference error: ${err.message}`;
+                outputText.innerHTML = `<span style="color: #ef4444; font-weight: 600;">API Transport Failure. Verify network routing settings.</span>`;
             } finally {
                 triggerBtn.disabled = false;
             }
@@ -890,21 +920,36 @@
 
         function predictReaction() {
             if (selectedReactants.length === 0) return;
-            const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.`;
+
+            const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
+RULES:
+1. If no reaction is standard/possible with the combined reactants, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
+2. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional. Use LaTeX delimiters like $...$ for all chemical formulas and equations.`;
+
             const prompt = `Predict the balanced equation outcome for: ${selectedReactants.join(' + ')}`;
-            runLocalInference(systemInstructions, prompt, 'predict-btn');
+            runChemistryInference(systemInstructions, prompt, 'predict-btn');
         }
 
         function solveTheory() {
             const val = document.getElementById('theoryQuestion').value;
             if (!val.trim()) return;
-            const systemInstructions = `You are the tokenjpg Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles.`;
-            runLocalInference(systemInstructions, val, 'theory-btn');
+
+            const systemInstructions = `You are the tokenjpg Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail intermediate structures (like carbocations or transition states) matching NCERT evaluation criteria. Keep answers focused and formatted cleanly. Use LaTeX delimiters like $...$ for all mathematical functions and chemical formulas.`;
+
+            runChemistryInference(systemInstructions, val, 'theory-btn');
         }
 
+        // Custom Safe Formatter
         function formatMarkdownOutput(text) {
-            let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            // Escape HTML but preserve LaTeX placeholders
+            let html = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            
+            // Restore LaTeX delimiters that were escaped by &lt;/&gt;
             html = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>'); 
+            
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/`(.*?)`/g, '<code>$1</code>');
             return html;
