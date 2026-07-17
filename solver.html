@@ -540,7 +540,6 @@
             padding: 24px;
             min-height: 200px;
             line-height: 1.7;
-            white-space: pre-wrap;
             position: relative;
         }
 
@@ -576,9 +575,10 @@
         .output-text-content {
             color: #e2e8f0;
             font-size: 0.95rem;
+            white-space: pre-wrap;
         }
 
-        /* Advanced NCERT Formatted Output Elements */
+        /* Formatted Response Elements */
         .output-text-content strong {
             color: #60a5fa;
             font-weight: 600;
@@ -862,22 +862,14 @@
             }
         }
 
-        // Helper to format simple markdown (**bold** and `code`) to match CSS styles
-        function formatMarkdown(text) {
-            let formatted = text
+        // Helper function to turn basic markdown (** and `) into clean HTML tags safely
+        function formatMarkdownToHTML(text) {
+            return text
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-            
-            // Convert bold formatting **text** to <strong>text</strong>
-            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // Convert code blocks `code` to <code>code</code>
-            formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
-            
-            // Convert newlines to breaks
-            formatted = formatted.replace(/\n/g, '<br>');
-            return formatted;
+                .replace(/>/g, "&gt;")
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`(.*?)`/g, '<code>$1</code>');
         }
 
         // --- Core Fixed Pollinations Endpoint Integration ---
@@ -908,56 +900,50 @@
             try {
                 const response = await fetch(url, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Inference HTTP Error! Status: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
+                
                 const data = await response.text();
-                outputText.innerHTML = formatMarkdown(data);
+                outputText.innerHTML = formatMarkdownToHTML(data);
             } catch (error) {
-                console.error("API Call failed:", error);
-                outputText.innerHTML = `<span style="color: #ef4444;">Error mapping molecular matrix: ${error.message}. Check your connection and try again.</span>`;
+                console.error("Inference Error:", error);
+                outputText.innerHTML = `<span style="color: #ef4444; font-weight:600;">System Error: Failed to compute reaction matrix. Ensure your connection is active.</span>`;
             } finally {
                 triggerBtn.disabled = false;
             }
         }
 
-        // Execute Reaction Prediction using reactants inside the Sandbox area
+        // Action Trigger 1: Equation Predictor Handler
         function predictReaction() {
             if (selectedReactants.length === 0) {
-                alert("Please add at least one compound or reagent to predict a reaction.");
+                alert("Please add at least one reactant parameter from the library map.");
                 return;
             }
-
-            const systemInstructions = "You are an expert organic chemistry tutor for Indian Class 11th & 12th CBSE/State Board exams. Analyze the reactants provided and write the balanced chemical reaction, name of the reaction (if applicable, e.g., Wurtz reaction, Friedel-Crafts), conditions required, and step-by-step mechanism. Keep the formatting clean, concise, and prioritize high-scoring exam points.";
-            const userPrompt = `Predict the chemical reaction when the following compounds/reagents are mixed: ${selectedReactants.join(" + ")}. Include structural steps, major/minor product designations, and structural formula names where appropriate.`;
             
-            runChemistryInference(systemInstructions, userPrompt, "predict-btn");
+            const systemPrompt = "You are an advanced organic chemistry tool calibrated for Indian CBSE Class 11 & 12 frameworks. Predict the major and minor products of the given reaction matrix. Specify name reactions (e.g., Wurtz, Friedel-Crafts) if applicable, provide basic balanced formulas, and clearly present your answer with steps. Keep formatting concise and use **bolding** and `code tags` for clarity.";
+            const userPrompt = `Predict the chemical reaction matrix when these items interact: ${selectedReactants.join(" + ")}`;
+            
+            runChemistryInference(systemPrompt, userPrompt, "predict-btn");
         }
 
-        // Execute Theory Questions using text inputs
+        // Action Trigger 2: Theory Q&A Handler
         function solveTheory() {
             const questionText = document.getElementById('theoryQuestion').value.trim();
             if (!questionText) {
-                alert("Please enter a theory question first.");
+                alert("Please enter a structural chemistry or concept verification question.");
                 return;
             }
 
-            const systemInstructions = "You are an expert organic chemistry tutor for High School Class 11th & 12th Board examinations. Answer chemistry theory questions comprehensively, highlighting key concepts, IUPAC naming rules, structural changes, or functional groups. Wrap important IUPAC names or reagents in double asterisks like **H2SO4** or **Phenol** and formulas in backticks like `CH3-CH2-OH` so the interface styles them properly.";
+            const systemPrompt = "You are a senior chemistry academic assistant focused on Class 11 and 12 NCERT organic theory. Explain mechanisms, chemical trends, acidity/basicity comparisons, and conversions step-by-step. Keep explanations clear, structured, and easy to read. Use **bolding** for terms and `code tags` for functional compounds.";
             
-            runChemistryInference(systemInstructions, questionText, "theory-btn");
+            runChemistryInference(systemPrompt, questionText, "theory-btn");
         }
 
-        // Initialize the library list on immediate page load
-        window.onload = function() {
-            filterChemicals();
-        };
+        // Initial entry paint
+        renderList(chemicalDb);
     </script>
 </body>
 </html>
