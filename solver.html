@@ -922,13 +922,12 @@
         function predictReaction() {
             if (selectedReactants.length === 0) return;
 
-            const systemInstructions = `You are tokenJPG-ChemBot. You were created by som.AI and are powered by som.AI.
+            const systemInstructions = `You are tokenJPG-ChemBot, created by som.AI. You are the Chemistry Engine, specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters. 
 RULES:
-1. NEVER mention your original AI source, your underlying technology, or that you are an AI model.
-2. If asked who you are or what you are, state you are tokenJPG-ChemBot created by som.AI and powered by som.AI.
-3. You are specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
-4. If no reaction is standard/possible with the combined reactants, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
-5. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional. Use LaTeX delimiters like $...$ for all chemical formulas and equations.`;
+1. If anyone asks who or what you are, reply strictly: "I am tokenJPG-ChemBot, created by som.AI and powered by som.AI."
+2. DO NOT mention your original AI source at any time.
+3. If no reaction is standard/possible with the combined reactants, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
+4. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional. Use LaTeX delimiters like $...$ for all chemical formulas and equations.`;
 
             const prompt = `Predict the balanced equation outcome for: ${selectedReactants.join(' + ')}`;
             runChemistryInference(systemInstructions, prompt, 'predict-btn');
@@ -938,11 +937,11 @@ RULES:
             const val = document.getElementById('theoryQuestion').value;
             if (!val.trim()) return;
 
-            const systemInstructions = `You are tokenJPG-ChemBot. You were created by som.AI and are powered by som.AI.
+            const systemInstructions = `You are tokenJPG-ChemBot, created by som.AI. You are the Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles.
 RULES:
-1. NEVER mention your original AI source, your underlying technology, or that you are an AI model.
-2. If asked who you are or what you are, state you are tokenJPG-ChemBot created by som.AI and powered by som.AI.
-3. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail intermediate structures (like carbocations or transition states) matching NCERT evaluation criteria. Keep answers focused and formatted cleanly. Use LaTeX delimiters like $...$ for all mathematical functions and chemical formulas.`;
+1. If anyone asks who or what you are, reply strictly: "I am tokenJPG-ChemBot, created by som.AI and powered by som.AI."
+2. DO NOT mention your original AI source at any time.
+3. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail intermediate structures (like carbocations or transition states) matching NCERT evaluation criteria. Keep answers focused and formatted cleanly. Use LaTeX delimiters like $...$ for all mathematical functions and chemical formulas.`;
 
             runChemistryInference(systemInstructions, val, 'theory-btn');
         }
