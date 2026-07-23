@@ -289,13 +289,6 @@
             color: var(--text-dim);
         }
 
-        .chem-formula-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
-        }
-
         .chem-formula {
             font-family: 'JetBrains Mono', monospace;
             color: var(--accent-emerald);
@@ -304,13 +297,6 @@
             background: rgba(16, 185, 129, 0.06);
             padding: 4px 8px;
             border-radius: 6px;
-        }
-
-        .chem-structure {
-            font-family: 'JetBrains Mono', monospace;
-            color: #60a5fa;
-            font-size: 0.7rem;
-            font-weight: 500;
         }
 
         /* --- Workspace Layout --- */
@@ -616,17 +602,6 @@
             border: 1px solid rgba(255,255,255,0.02);
         }
 
-        .output-text-content pre {
-            font-family: 'JetBrains Mono', monospace;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            color: #a7f3d0;
-            overflow-x: auto;
-        }
-
         /* Loading UI Animation */
         .loading-dots {
             display: flex;
@@ -756,36 +731,36 @@
     </div>
 
     <script>
-        // High-fidelity Class 11th & 12th Chemical Index Database with Structural Formulas
+        // High-fidelity Class 11th & 12th Chemical Index Database
         const chemicalDb = [
-            { name: "Methane", formula: "CH4", structure: "CH4", type: "organic" },
-            { name: "Ethane", formula: "C2H6", structure: "CH3-CH3", type: "organic" },
-            { name: "Ethene", formula: "C2H4", structure: "CH2=CH2", type: "organic" },
-            { name: "Ethyne", formula: "C2H2", structure: "HC≡CH", type: "organic" },
-            { name: "Methanol", formula: "CH3OH", structure: "CH3-OH", type: "organic" },
-            { name: "Ethanol", formula: "C2H5OH", structure: "CH3-CH2-OH", type: "organic" },
-            { name: "Acetaldehyde", formula: "CH3CHO", structure: "CH3-CH=O", type: "organic" },
-            { name: "Acetone", formula: "CH3COCH3", structure: "CH3-C(=O)-CH3", type: "organic" },
-            { name: "Acetic Acid", formula: "CH3COOH", structure: "CH3-C(=O)-OH", type: "organic" },
-            { name: "Benzene", formula: "C6H6", structure: "C6H6 (Ph-H)", type: "organic" },
-            { name: "Toluene", formula: "C6H5CH3", structure: "Ph-CH3", type: "organic" },
-            { name: "Phenol", formula: "C6H5OH", structure: "Ph-OH", type: "organic" },
-            { name: "Aniline", formula: "C6H5NH2", structure: "Ph-NH2", type: "organic" },
-            { name: "Benzene Diazonium Chloride", formula: "C6H5N2Cl", structure: "Ph-N2+Cl-", type: "organic" },
-            { name: "Anhydrous AlCl3", formula: "AlCl3", structure: "AlCl3", type: "reagent" },
-            { name: "Acidified KMnO4", formula: "KMnO4/H+", structure: "KMnO4/H+", type: "reagent" },
-            { name: "LiAlH4 (LAH)", formula: "LiAlH4", structure: "LiAlH4", type: "reagent" },
-            { name: "Zinc Dust", formula: "Zn dust", structure: "Zn", type: "reagent" },
-            { name: "Aqueous NaOH", formula: "NaOH (aq)", structure: "NaOH (aq)", type: "reagent" },
-            { name: "Alcoholic KOH", formula: "KOH (alc)", structure: "KOH (alc)", type: "reagent" },
-            { name: "Sodamide", formula: "NaNH2", structure: "NaNH2", type: "reagent" },
-            { name: "Sodium in Dry Ether", formula: "Na/Ether", structure: "Na / Ether", type: "reagent" },
-            { name: "Water", formula: "H2O", structure: "H-O-H", type: "inorganic" },
-            { name: "Hydrochloric Acid", formula: "HCl", structure: "H-Cl", type: "inorganic" },
-            { name: "Sulphuric Acid", formula: "H2SO4", structure: "H2SO4", type: "inorganic" },
-            { name: "Nitric Acid", formula: "HNO3", structure: "HNO3", type: "inorganic" },
-            { name: "Chlorine Gas", formula: "Cl2", structure: "Cl-Cl", type: "inorganic" },
-            { name: "Sodium Metal", formula: "Na", structure: "Na", type: "inorganic" }
+            { name: "Methane", formula: "CH4", type: "organic" },
+            { name: "Ethane", formula: "C2H6", type: "organic" },
+            { name: "Ethene", formula: "C2H4", type: "organic" },
+            { name: "Ethyne", formula: "C2H2", type: "organic" },
+            { name: "Methanol", formula: "CH3OH", type: "organic" },
+            { name: "Ethanol", formula: "C2H5OH", type: "organic" },
+            { name: "Acetaldehyde", formula: "CH3CHO", type: "organic" },
+            { name: "Acetone", formula: "CH3COCH3", type: "organic" },
+            { name: "Acetic Acid", formula: "CH3COOH", type: "organic" },
+            { name: "Benzene", formula: "C6H6", type: "organic" },
+            { name: "Toluene", formula: "C6H5CH3", type: "organic" },
+            { name: "Phenol", formula: "C6H5OH", type: "organic" },
+            { name: "Aniline", formula: "C6H5NH2", type: "organic" },
+            { name: "Benzene Diazonium Chloride", formula: "C6H5N2Cl", type: "organic" },
+            { name: "Anhydrous AlCl3", formula: "AlCl3", type: "reagent" },
+            { name: "Acidified KMnO4", formula: "KMnO4/H+", type: "reagent" },
+            { name: "LiAlH4 (LAH)", formula: "LiAlH4", type: "reagent" },
+            { name: "Zinc Dust", formula: "Zn dust", type: "reagent" },
+            { name: "Aqueous NaOH", formula: "NaOH (aq)", type: "reagent" },
+            { name: "Alcoholic KOH", formula: "KOH (alc)", type: "reagent" },
+            { name: "Sodamide", formula: "NaNH2", type: "reagent" },
+            { name: "Sodium in Dry Ether", formula: "Na/Ether", type: "reagent" },
+            { name: "Water", formula: "H2O", type: "inorganic" },
+            { name: "Hydrochloric Acid", formula: "HCl", type: "inorganic" },
+            { name: "Sulphuric Acid", formula: "H2SO4", type: "inorganic" },
+            { name: "Nitric Acid", formula: "HNO3", type: "inorganic" },
+            { name: "Chlorine Gas", formula: "Cl2", type: "inorganic" },
+            { name: "Sodium Metal", formula: "Na", type: "inorganic" }
         ];
 
         let selectedReactants = [];
@@ -799,10 +774,7 @@
                         <span class="chem-name">${item.name}</span>
                         <span class="chem-tag">${item.type}</span>
                     </div>
-                    <div class="chem-formula-group">
-                        <span class="chem-formula">${item.formula}</span>
-                        ${item.structure ? `<span class="chem-structure">${item.structure}</span>` : ''}
-                    </div>
+                    <span class="chem-formula">${item.formula}</span>
                 </div>
             `).join('');
         }
@@ -824,7 +796,7 @@
 
             const exists = chemicalDb.some(c => c.formula.toLowerCase() === formula.toLowerCase());
             if (!exists) {
-                chemicalDb.unshift({ name, formula, structure: formula, type });
+                chemicalDb.unshift({ name, formula, type });
                 filterChemicals(); 
                 
                 nameInput.value = '';
@@ -953,15 +925,9 @@
             const systemInstructions = `You are the tokenjpg Chemistry Engine, specialized strictly in Class 11 and Class 12 CBSE/NCERT Organic and Inorganic chemistry parameters.
 RULES:
 1. If no reaction is standard/possible with the combined reactants, your response MUST begin with the exact text "Not Possible" followed by a highly precise 2-3 sentence NCERT-based explanation why.
-2. If the reaction is possible:
-   a. Write the overall balanced chemical equation.
-   b. FOR ALL ORGANIC REACTANTS AND PRODUCTS, YOU MUST PROVIDE BOTH:
-      - Molecular/Chemical Formula (e.g., $C_2H_6O$)
-      - Condensed Structural Formula / Bond-Line Representation (e.g., $CH_3-CH_2-OH$ or explicit bond linkages like $CH_3-C(=O)-OH$)
-      - ASCII / Clean Text-based Structural Diagram or Bond-Line Representation whenever relevant for clear visual understanding.
-   c. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional. Use LaTeX delimiters like $...$ for all chemical formulas, structural notation, and equations.`;
+2. If the reaction is possible, write the balanced chemical equation. Outline catalysts, conditions (e.g. heating, cold, concentration), and explain the major/minor products (such as Markovnikov/Saytzeff rules). Formatting should be clean, clear, and highly professional. Use LaTeX delimiters like $...$ for all chemical formulas and equations.`;
 
-            const prompt = `Predict the balanced equation outcome, along with full structural/bondline formulas and diagrams, for: ${selectedReactants.join(' + ')}`;
+            const prompt = `Predict the balanced equation outcome for: ${selectedReactants.join(' + ')}`;
             runChemistryInference(systemInstructions, prompt, 'predict-btn');
         }
 
@@ -969,7 +935,7 @@ RULES:
             const val = document.getElementById('theoryQuestion').value;
             if (!val.trim()) return;
 
-            const systemInstructions = `You are the tokenjpg Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail structural formulas and bond-line representations for every reactant, intermediate, and product (including carbocations, cyclic rings, or transition states) matching NCERT evaluation criteria. ALWAYS show both chemical formulas and structural/bondline formulas (e.g., $CH_3-CH_2-OH$, $Ph-OH$, $CH_2=CH-CH_3$) or structural diagrams using code blocks/ASCII. Keep answers focused and formatted cleanly. Use LaTeX delimiters like $...$ for all mathematical functions, chemical formulas, and structural formulas.`;
+            const systemInstructions = `You are the tokenjpg Chemistry Engine. Provide professional, deep academic explanations of Class 11 & 12 chemistry principles. Give step-by-step mechanisms for named reactions, write out equations using clean text layouts, and detail intermediate structures (like carbocations or transition states) matching NCERT evaluation criteria. Keep answers focused and formatted cleanly. Use LaTeX delimiters like $...$ for all mathematical functions and chemical formulas.`;
 
             runChemistryInference(systemInstructions, val, 'theory-btn');
         }
@@ -985,9 +951,6 @@ RULES:
             // Restore LaTeX delimiters that were escaped by &lt;/&gt;
             html = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>'); 
             
-            // Format Code blocks (for structural diagrams / bond line representations)
-            html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/`(.*?)`/g, '<code>$1</code>');
             return html;
